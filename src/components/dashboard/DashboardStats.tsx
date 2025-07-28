@@ -1,50 +1,59 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Package, Cpu, Trash2, AlertTriangle, TrendingUp, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export const DashboardStats = () => {
+  const navigate = useNavigate();
+
   const stats = [
     {
       title: "Total Assets",
       value: "1,247",
       change: "+12.5%",
       icon: Package,
-      color: "text-primary"
+      color: "text-primary",
+      route: "/assets/total"
     },
     {
       title: "Physical Assets",
       value: "892",
       change: "+8.2%",
       icon: Package,
-      color: "text-accent"
+      color: "text-accent",
+      route: "/assets/physical"
     },
     {
       title: "Digital Assets",
       value: "234",
       change: "+15.3%",
       icon: Cpu,
-      color: "text-primary-glow"
+      color: "text-primary-glow",
+      route: "/assets/digital"
     },
     {
       title: "Consumables",
       value: "121",
       change: "+5.1%",
       icon: Trash2,
-      color: "text-warning"
+      color: "text-warning",
+      route: "/assets/consumables"
     },
     {
       title: "Maintenance Due",
       value: "23",
       change: "-2.1%",
       icon: AlertTriangle,
-      color: "text-destructive"
+      color: "text-destructive",
+      route: "/assets/maintenance"
     },
     {
       title: "Active Users",
       value: "89",
       change: "+3.2%",
       icon: Users,
-      color: "text-accent"
+      color: "text-accent",
+      route: "/assets/users"
     }
   ];
 
@@ -55,7 +64,11 @@ export const DashboardStats = () => {
         const isPositive = stat.change.startsWith('+');
         
         return (
-          <Card key={index} className="relative overflow-hidden bg-gradient-to-br from-card to-card/80 border shadow-md hover:shadow-lg transition-shadow">
+          <Card 
+            key={index} 
+            className="relative overflow-hidden bg-gradient-to-br from-card to-card/80 border shadow-md hover:shadow-lg transition-all cursor-pointer hover:scale-105"
+            onClick={() => navigate(stat.route)}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.title}
