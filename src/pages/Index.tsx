@@ -3,7 +3,7 @@ import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { AssetChart } from "@/components/dashboard/AssetChart";
 import { RecentAssets } from "@/components/dashboard/RecentAssets";
-import { AssetForm } from "@/components/forms/AssetForm";
+import { AssetTypeSelector } from "@/components/forms/AssetTypeSelector";
 
 const Index = () => {
   const [showAssetForm, setShowAssetForm] = useState(false);
@@ -19,7 +19,7 @@ const Index = () => {
       </DashboardLayout>
       
       {showAssetForm && (
-        <AssetForm onClose={() => setShowAssetForm(false)} />
+        <AssetTypeSelector onClose={() => setShowAssetForm(false)} />
       )}
     </>
   );

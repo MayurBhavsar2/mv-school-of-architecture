@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Search, Filter } from "lucide-react";
+import { ArrowLeft, Plus, Search, Filter, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,25 +15,25 @@ const AssetsPage = () => {
   // Mock data for different categories
   const mockData = {
     total: [
-      { id: "AST001", name: "Dell Laptop", type: "Digital", location: "Lab A", faculty: "Dr. Smith", status: "Active" },
-      { id: "AST002", name: "Projector", type: "Physical", location: "Room 101", faculty: "Prof. Johnson", status: "Active" },
-      { id: "AST003", name: "Software License", type: "Digital", location: "Server", faculty: "IT Admin", status: "Active" },
-      { id: "AST004", name: "Printer Paper", type: "Consumable", location: "Office", faculty: "Admin", status: "Low Stock" },
+      { id: "AST001", name: "Microsoft Office 365", type: "Digital", licenseKey: "ABC123-DEF456", faculty: "Dr. Smith", status: "Active" },
+      { id: "AST002", name: "Projector", type: "Physical", gpsDeviceId: "GPS001", faculty: "Prof. Johnson", status: "Active" },
+      { id: "AST003", name: "AutoCAD License", type: "Digital", licenseKey: "XYZ789-QWE012", faculty: "IT Admin", status: "Active" },
+      { id: "AST004", name: "Printer Paper", type: "Consumable", supplier: "Office Supplies Co.", faculty: "Admin", status: "Low Stock" },
     ],
     physical: [
-      { id: "AST002", name: "Projector", type: "Physical", location: "Room 101", faculty: "Prof. Johnson", status: "Active" },
-      { id: "AST005", name: "Whiteboard", type: "Physical", location: "Room 102", faculty: "Dr. Brown", status: "Active" },
-      { id: "AST006", name: "Microscope", type: "Physical", location: "Lab B", faculty: "Dr. Wilson", status: "Maintenance Due" },
+      { id: "AST002", name: "Projector", type: "Physical", gpsDeviceId: "GPS001", faculty: "Prof. Johnson", status: "Active" },
+      { id: "AST005", name: "Whiteboard", type: "Physical", gpsDeviceId: "GPS002", faculty: "Dr. Brown", status: "Active" },
+      { id: "AST006", name: "Microscope", type: "Physical", gpsDeviceId: "GPS003", faculty: "Dr. Wilson", status: "Maintenance Due" },
     ],
     digital: [
-      { id: "AST001", name: "Dell Laptop", type: "Digital", location: "Lab A", faculty: "Dr. Smith", status: "Active" },
-      { id: "AST003", name: "Software License", type: "Digital", location: "Server", faculty: "IT Admin", status: "Active" },
-      { id: "AST007", name: "iPad", type: "Digital", location: "Library", faculty: "Librarian", status: "Active" },
+      { id: "AST001", name: "Microsoft Office 365", type: "Digital", licenseKey: "ABC123-DEF456", faculty: "Dr. Smith", status: "Active" },
+      { id: "AST003", name: "AutoCAD License", type: "Digital", licenseKey: "XYZ789-QWE012", faculty: "IT Admin", status: "Active" },
+      { id: "AST007", name: "Adobe Creative Suite", type: "Digital", licenseKey: "ADB456-SUI789", faculty: "Prof. Design", status: "Active" },
     ],
     consumables: [
-      { id: "AST004", name: "Printer Paper", type: "Consumable", location: "Office", faculty: "Admin", status: "Low Stock" },
-      { id: "AST008", name: "Markers", type: "Consumable", location: "Room 101", faculty: "Admin", status: "In Stock" },
-      { id: "AST009", name: "Toner Cartridge", type: "Consumable", location: "Office", faculty: "Admin", status: "Out of Stock" },
+      { id: "AST004", name: "Printer Paper", type: "Consumable", supplier: "Office Supplies Co.", faculty: "Admin", status: "Low Stock" },
+      { id: "AST008", name: "Markers", type: "Consumable", supplier: "Stationery Plus", faculty: "Admin", status: "In Stock" },
+      { id: "AST009", name: "Toner Cartridge", type: "Consumable", supplier: "Print Solutions", faculty: "Admin", status: "Out of Stock" },
     ],
     maintenance: [
       { id: "AST006", name: "Microscope", type: "Physical", location: "Lab B", faculty: "Dr. Wilson", status: "Maintenance Due", dueDate: "2024-02-15" },
@@ -134,11 +134,17 @@ const AssetsPage = () => {
                   <TableHead>ID</TableHead>
                   <TableHead>Name</TableHead>
                   {category !== 'users' && <TableHead>Type</TableHead>}
-                  <TableHead>{category === 'users' ? 'Department' : 'Location'}</TableHead>
+                  <TableHead>
+                    {category === 'users' ? 'Department' : 
+                     category === 'physical' ? 'GPS Device ID' :
+                     category === 'digital' ? 'License Key' : 
+                     category === 'consumables' ? 'Supplier' : 'Info'}
+                  </TableHead>
                   <TableHead>{category === 'users' ? 'Assets Count' : 'Assigned To'}</TableHead>
                   <TableHead>Status</TableHead>
                   {category === 'maintenance' && <TableHead>Due Date</TableHead>}
                   {category === 'users' && <TableHead>Last Active</TableHead>}
+                  {category === 'physical' && <TableHead>Action</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -147,7 +153,12 @@ const AssetsPage = () => {
                     <TableCell className="font-medium">{item.id}</TableCell>
                     <TableCell>{item.name}</TableCell>
                     {category !== 'users' && <TableCell>{item.type}</TableCell>}
-                    <TableCell>{category === 'users' ? item.department : item.location}</TableCell>
+                    <TableCell>
+                      {category === 'users' ? item.department : 
+                       category === 'physical' ? item.gpsDeviceId :
+                       category === 'digital' ? item.licenseKey : 
+                       category === 'consumables' ? item.supplier : item.location}
+                    </TableCell>
                     <TableCell>{category === 'users' ? item.assets : item.faculty}</TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(item.status)}>
@@ -156,6 +167,14 @@ const AssetsPage = () => {
                     </TableCell>
                     {category === 'maintenance' && <TableCell>{item.dueDate}</TableCell>}
                     {category === 'users' && <TableCell>{item.lastActive}</TableCell>}
+                    {category === 'physical' && (
+                      <TableCell>
+                        <Button size="sm" variant="outline" className="gap-2">
+                          <MapPin className="h-4 w-4" />
+                          Track Location
+                        </Button>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
               </TableBody>
