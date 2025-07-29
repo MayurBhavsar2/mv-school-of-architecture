@@ -23,6 +23,10 @@ export const DashboardLayout = ({ children, onAddAsset }: DashboardLayoutProps) 
                 <Bell className="h-4 w-4 mr-2" />
                 Alerts
               </Button>
+              <Button variant="outline" size="sm" onClick={() => window.location.href = '/handover'}>
+                <Settings className="h-4 w-4 mr-2" />
+                Hand-Over
+              </Button>
               <Button variant="outline" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
                 Settings

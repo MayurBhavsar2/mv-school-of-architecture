@@ -1,16 +1,18 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Search, Filter, MapPin, Edit } from "lucide-react";
+import { ArrowLeft, Plus, Search, Filter, MapPin, Edit, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useState } from "react";
 
 const AssetsPage = () => {
   const { category } = useParams();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Mock data for different categories
   const mockData = {
@@ -19,13 +21,15 @@ const AssetsPage = () => {
         id: "AST001", name: "Microsoft Office 365", type: "Digital", licenseKey: "ABC123-DEF456", 
         faculty: "Dr. Smith", hod: "Prof. Computer Science", status: "Active", 
         activationDate: "2023-01-15", expiryDate: "2024-01-15", quantity: 50,
-        vendor: "Microsoft Corp", vendorContact: "+1-800-642-7676", vendorEmail: "support@microsoft.com"
+        vendor: "Microsoft Corp", vendorContact: "+1-800-642-7676", vendorEmail: "support@microsoft.com",
+        picture: "office365_license.jpg", invoice: "INV001.pdf"
       },
       { 
         id: "AST002", name: "Projector", type: "Physical", gpsDeviceId: "GPS001", 
         faculty: "Prof. Johnson", hod: "Dr. Physics Head", status: "Active",
         location: "Room 101", vendor: "Epson", vendorContact: "+91-9876543210", 
-        vendorEmail: "support@epson.com", maintenanceType: "Annual", maintenanceFrequency: "12 months"
+        vendorEmail: "support@epson.com", maintenanceType: "Annual", maintenanceFrequency: "12 months",
+        picture: "projector.jpg", invoice: "INV002.pdf"
       },
       { 
         id: "AST003", name: "AutoCAD License", type: "Digital", licenseKey: "XYZ789-QWE012", 
@@ -208,6 +212,7 @@ const AssetsPage = () => {
                   {category === 'consumables' && <TableHead>Unit Type</TableHead>}
                   <TableHead>Quantity</TableHead>
                   <TableHead>Vendor</TableHead>
+                  <TableHead>Picture</TableHead>
                   <TableHead>Status</TableHead>
                   {category === 'maintenance' && <TableHead>Due Date</TableHead>}
                   <TableHead>Actions</TableHead>
@@ -226,6 +231,20 @@ const AssetsPage = () => {
                     {category === 'consumables' && <TableCell>{item.unitType}</TableCell>}
                     <TableCell>{item.quantity || 'N/A'}</TableCell>
                     <TableCell>{item.vendor}</TableCell>
+                    <TableCell>
+                      {item.picture ? (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => setSelectedImage(item.picture)}
+                        >
+                          <Eye className="h-3 w-3 mr-1" />
+                          View
+                        </Button>
+                      ) : (
+                        "No picture"
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(item.status)}>
                         {item.status}
@@ -253,6 +272,23 @@ const AssetsPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      {selectedImage && (
+        <Dialog open={true} onOpenChange={() => setSelectedImage(null)}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Asset Picture</DialogTitle>
+            </DialogHeader>
+            <div className="flex justify-center">
+              <img 
+                src={`https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=300&fit=crop`}
+                alt="Asset"
+                className="max-w-full h-auto rounded-lg"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

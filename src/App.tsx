@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AssetsPage from "./pages/AssetsPage";
 import AlertsPage from "./pages/AlertsPage";
+import HandOverPage from "./pages/HandOverPage";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/assets/:category" element={<AssetsPage />} />
           <Route path="/alerts" element={<AlertsPage />} />
+          <Route path="/handover" element={<HandOverPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
