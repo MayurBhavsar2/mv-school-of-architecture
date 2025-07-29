@@ -15,11 +15,11 @@ export const DashboardLayout = ({ children, onAddAsset }: DashboardLayoutProps) 
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">AssetWise Admin</h1>
+              <h1 className="text-2xl font-bold text-foreground">MV School of Architecture</h1>
               <p className="text-muted-foreground">Asset Management System</p>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" onClick={() => window.location.href = '/alerts'}>
                 <Bell className="h-4 w-4 mr-2" />
                 Alerts
               </Button>

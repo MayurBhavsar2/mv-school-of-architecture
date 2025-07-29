@@ -47,14 +47,6 @@ export const DashboardStats = () => {
       color: "text-destructive",
       route: "/assets/maintenance"
     },
-    {
-      title: "Active Users",
-      value: "89",
-      change: "+3.2%",
-      icon: Users,
-      color: "text-accent",
-      route: "/assets/users"
-    }
   ];
 
   return (

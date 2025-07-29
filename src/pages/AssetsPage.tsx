@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Search, Filter, MapPin } from "lucide-react";
+import { ArrowLeft, Plus, Search, Filter, MapPin, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,34 +15,102 @@ const AssetsPage = () => {
   // Mock data for different categories
   const mockData = {
     total: [
-      { id: "AST001", name: "Microsoft Office 365", type: "Digital", licenseKey: "ABC123-DEF456", faculty: "Dr. Smith", status: "Active" },
-      { id: "AST002", name: "Projector", type: "Physical", gpsDeviceId: "GPS001", faculty: "Prof. Johnson", status: "Active" },
-      { id: "AST003", name: "AutoCAD License", type: "Digital", licenseKey: "XYZ789-QWE012", faculty: "IT Admin", status: "Active" },
-      { id: "AST004", name: "Printer Paper", type: "Consumable", supplier: "Office Supplies Co.", faculty: "Admin", status: "Low Stock" },
+      { 
+        id: "AST001", name: "Microsoft Office 365", type: "Digital", licenseKey: "ABC123-DEF456", 
+        faculty: "Dr. Smith", hod: "Prof. Computer Science", status: "Active", 
+        activationDate: "2023-01-15", expiryDate: "2024-01-15", quantity: 50,
+        vendor: "Microsoft Corp", vendorContact: "+1-800-642-7676", vendorEmail: "support@microsoft.com"
+      },
+      { 
+        id: "AST002", name: "Projector", type: "Physical", gpsDeviceId: "GPS001", 
+        faculty: "Prof. Johnson", hod: "Dr. Physics Head", status: "Active",
+        location: "Room 101", vendor: "Epson", vendorContact: "+91-9876543210", 
+        vendorEmail: "support@epson.com", maintenanceType: "Annual", maintenanceFrequency: "12 months"
+      },
+      { 
+        id: "AST003", name: "AutoCAD License", type: "Digital", licenseKey: "XYZ789-QWE012", 
+        faculty: "IT Admin", hod: "Dr. IT Head", status: "Active",
+        activationDate: "2023-06-01", expiryDate: "2024-06-01", quantity: 25,
+        vendor: "Autodesk", vendorContact: "+1-415-507-5000", vendorEmail: "support@autodesk.com"
+      },
+      { 
+        id: "AST004", name: "Printer Paper", type: "Consumable", supplier: "Office Supplies Co.", 
+        faculty: "Admin", hod: "Admin Head", status: "Low Stock", unitType: "Box",
+        quantity: 5, returnQuantity: 0, alertThreshold: 10, expiryDate: "2025-12-31",
+        vendor: "Office Supplies Co.", vendorContact: "+91-9988776655", vendorEmail: "sales@officesupplies.com"
+      },
     ],
     physical: [
-      { id: "AST002", name: "Projector", type: "Physical", gpsDeviceId: "GPS001", faculty: "Prof. Johnson", status: "Active" },
-      { id: "AST005", name: "Whiteboard", type: "Physical", gpsDeviceId: "GPS002", faculty: "Dr. Brown", status: "Active" },
-      { id: "AST006", name: "Microscope", type: "Physical", gpsDeviceId: "GPS003", faculty: "Dr. Wilson", status: "Maintenance Due" },
+      { 
+        id: "AST002", name: "Projector", type: "Physical", gpsDeviceId: "GPS001", 
+        faculty: "Prof. Johnson", hod: "Dr. Physics Head", status: "Active",
+        location: "Room 101", vendor: "Epson", vendorContact: "+91-9876543210", 
+        vendorEmail: "support@epson.com", maintenanceType: "Annual", maintenanceFrequency: "12 months"
+      },
+      { 
+        id: "AST005", name: "Whiteboard", type: "Physical", gpsDeviceId: "GPS002", 
+        faculty: "Dr. Brown", hod: "Dr. Math Head", status: "Active",
+        location: "Room 205", vendor: "Board Solutions", vendorContact: "+91-9876543211",
+        vendorEmail: "info@boardsolutions.com", maintenanceType: "Cleaning", maintenanceFrequency: "6 months"
+      },
+      { 
+        id: "AST006", name: "Microscope", type: "Physical", gpsDeviceId: "GPS003", 
+        faculty: "Dr. Wilson", hod: "Dr. Biology Head", status: "Maintenance Due",
+        location: "Lab B", vendor: "Scientific Instruments", vendorContact: "+91-9876543212",
+        vendorEmail: "service@scientific.com", maintenanceType: "Calibration", maintenanceFrequency: "6 months"
+      },
     ],
     digital: [
-      { id: "AST001", name: "Microsoft Office 365", type: "Digital", licenseKey: "ABC123-DEF456", faculty: "Dr. Smith", status: "Active" },
-      { id: "AST003", name: "AutoCAD License", type: "Digital", licenseKey: "XYZ789-QWE012", faculty: "IT Admin", status: "Active" },
-      { id: "AST007", name: "Adobe Creative Suite", type: "Digital", licenseKey: "ADB456-SUI789", faculty: "Prof. Design", status: "Active" },
+      { 
+        id: "AST001", name: "Microsoft Office 365", type: "Digital", licenseKey: "ABC123-DEF456", 
+        faculty: "Dr. Smith", hod: "Prof. Computer Science", status: "Active", 
+        activationDate: "2023-01-15", expiryDate: "2024-01-15", quantity: 50,
+        vendor: "Microsoft Corp", vendorContact: "+1-800-642-7676", vendorEmail: "support@microsoft.com"
+      },
+      { 
+        id: "AST003", name: "AutoCAD License", type: "Digital", licenseKey: "XYZ789-QWE012", 
+        faculty: "IT Admin", hod: "Dr. IT Head", status: "Active",
+        activationDate: "2023-06-01", expiryDate: "2024-06-01", quantity: 25,
+        vendor: "Autodesk", vendorContact: "+1-415-507-5000", vendorEmail: "support@autodesk.com"
+      },
+      { 
+        id: "AST007", name: "Adobe Creative Suite", type: "Digital", licenseKey: "ADB456-SUI789", 
+        faculty: "Prof. Design", hod: "Dr. Design Head", status: "Active",
+        activationDate: "2023-03-01", expiryDate: "2024-03-01", quantity: 15,
+        vendor: "Adobe Inc", vendorContact: "+1-408-536-6000", vendorEmail: "support@adobe.com"
+      },
     ],
     consumables: [
-      { id: "AST004", name: "Printer Paper", type: "Consumable", supplier: "Office Supplies Co.", faculty: "Admin", status: "Low Stock" },
-      { id: "AST008", name: "Markers", type: "Consumable", supplier: "Stationery Plus", faculty: "Admin", status: "In Stock" },
-      { id: "AST009", name: "Toner Cartridge", type: "Consumable", supplier: "Print Solutions", faculty: "Admin", status: "Out of Stock" },
+      { 
+        id: "AST004", name: "Printer Paper", type: "Consumable", supplier: "Office Supplies Co.", 
+        faculty: "Admin", hod: "Admin Head", status: "Low Stock", unitType: "Box",
+        quantity: 5, returnQuantity: 0, alertThreshold: 10, expiryDate: "2025-12-31",
+        vendor: "Office Supplies Co.", vendorContact: "+91-9988776655", vendorEmail: "sales@officesupplies.com"
+      },
+      { 
+        id: "AST008", name: "Markers", type: "Consumable", supplier: "Stationery Plus", 
+        faculty: "Admin", hod: "Admin Head", status: "In Stock", unitType: "Pack",
+        quantity: 25, returnQuantity: 2, alertThreshold: 5, expiryDate: "2025-06-30",
+        vendor: "Stationery Plus", vendorContact: "+91-9988776656", vendorEmail: "sales@stationeryplus.com"
+      },
+      { 
+        id: "AST009", name: "Toner Cartridge", type: "Consumable", supplier: "Print Solutions", 
+        faculty: "Admin", hod: "Admin Head", status: "Out of Stock", unitType: "Piece",
+        quantity: 0, returnQuantity: 0, alertThreshold: 3, expiryDate: "2025-12-31",
+        vendor: "Print Solutions", vendorContact: "+91-9988776657", vendorEmail: "sales@printsolutions.com"
+      },
     ],
     maintenance: [
-      { id: "AST006", name: "Microscope", type: "Physical", location: "Lab B", faculty: "Dr. Wilson", status: "Maintenance Due", dueDate: "2024-02-15" },
-      { id: "AST010", name: "Air Conditioner", type: "Physical", location: "Room 201", faculty: "Maintenance", status: "Maintenance Due", dueDate: "2024-02-10" },
-    ],
-    users: [
-      { id: "U001", name: "Dr. Smith", role: "Faculty", department: "Computer Science", assets: 5, lastActive: "2024-01-28" },
-      { id: "U002", name: "Prof. Johnson", role: "Faculty", department: "Physics", assets: 3, lastActive: "2024-01-27" },
-      { id: "U003", name: "Dr. Brown", role: "HOD", department: "Mathematics", assets: 8, lastActive: "2024-01-28" },
+      { 
+        id: "AST006", name: "Microscope", type: "Physical", location: "Lab B", 
+        faculty: "Dr. Wilson", hod: "Dr. Biology Head", status: "Maintenance Due", dueDate: "2024-02-15",
+        gpsDeviceId: "GPS003", maintenanceType: "Calibration", maintenanceFrequency: "6 months"
+      },
+      { 
+        id: "AST010", name: "Air Conditioner", type: "Physical", location: "Room 201", 
+        faculty: "Maintenance", hod: "Facility Head", status: "Maintenance Due", dueDate: "2024-02-10",
+        gpsDeviceId: "GPS004", maintenanceType: "Service", maintenanceFrequency: "3 months"
+      },
     ]
   };
 
@@ -53,7 +121,6 @@ const AssetsPage = () => {
       case 'digital': return 'Digital Assets';
       case 'consumables': return 'Consumables';
       case 'maintenance': return 'Maintenance Due';
-      case 'users': return 'Active Users';
       default: return 'Assets';
     }
   };
@@ -133,18 +200,17 @@ const AssetsPage = () => {
                 <TableRow>
                   <TableHead>ID</TableHead>
                   <TableHead>Name</TableHead>
-                  {category !== 'users' && <TableHead>Type</TableHead>}
-                  <TableHead>
-                    {category === 'users' ? 'Department' : 
-                     category === 'physical' ? 'GPS Device ID' :
-                     category === 'digital' ? 'License Key' : 
-                     category === 'consumables' ? 'Supplier' : 'Info'}
-                  </TableHead>
-                  <TableHead>{category === 'users' ? 'Assets Count' : 'Assigned To'}</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Faculty</TableHead>
+                  <TableHead>HOD</TableHead>
+                  {category === 'physical' && <TableHead>GPS Device ID</TableHead>}
+                  {category === 'digital' && <TableHead>License Key</TableHead>}
+                  {category === 'consumables' && <TableHead>Unit Type</TableHead>}
+                  <TableHead>Quantity</TableHead>
+                  <TableHead>Vendor</TableHead>
                   <TableHead>Status</TableHead>
                   {category === 'maintenance' && <TableHead>Due Date</TableHead>}
-                  {category === 'users' && <TableHead>Last Active</TableHead>}
-                  {category === 'physical' && <TableHead>Action</TableHead>}
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -152,29 +218,34 @@ const AssetsPage = () => {
                   <TableRow key={item.id} className="hover:bg-muted/50">
                     <TableCell className="font-medium">{item.id}</TableCell>
                     <TableCell>{item.name}</TableCell>
-                    {category !== 'users' && <TableCell>{item.type}</TableCell>}
-                    <TableCell>
-                      {category === 'users' ? item.department : 
-                       category === 'physical' ? item.gpsDeviceId :
-                       category === 'digital' ? item.licenseKey : 
-                       category === 'consumables' ? item.supplier : item.location}
-                    </TableCell>
-                    <TableCell>{category === 'users' ? item.assets : item.faculty}</TableCell>
+                    <TableCell>{item.type}</TableCell>
+                    <TableCell>{item.faculty}</TableCell>
+                    <TableCell>{item.hod}</TableCell>
+                    {category === 'physical' && <TableCell>{item.gpsDeviceId}</TableCell>}
+                    {category === 'digital' && <TableCell>{item.licenseKey}</TableCell>}
+                    {category === 'consumables' && <TableCell>{item.unitType}</TableCell>}
+                    <TableCell>{item.quantity || 'N/A'}</TableCell>
+                    <TableCell>{item.vendor}</TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(item.status)}>
                         {item.status}
                       </Badge>
                     </TableCell>
                     {category === 'maintenance' && <TableCell>{item.dueDate}</TableCell>}
-                    {category === 'users' && <TableCell>{item.lastActive}</TableCell>}
-                    {category === 'physical' && (
-                      <TableCell>
-                        <Button size="sm" variant="outline" className="gap-2">
-                          <MapPin className="h-4 w-4" />
-                          Track Location
+                    <TableCell>
+                      <div className="flex gap-2">
+                        {category === 'physical' && (
+                          <Button size="sm" variant="outline" className="gap-1">
+                            <MapPin className="h-3 w-3" />
+                            Track
+                          </Button>
+                        )}
+                        <Button size="sm" variant="outline" className="gap-1">
+                          <Edit className="h-3 w-3" />
+                          Update
                         </Button>
-                      </TableCell>
-                    )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
