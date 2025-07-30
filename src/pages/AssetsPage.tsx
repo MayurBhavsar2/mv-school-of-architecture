@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { AssetTypeSelector } from "@/components/forms/AssetTypeSelector";
 import { useState } from "react";
 
 const AssetsPage = () => {
@@ -13,6 +14,7 @@ const AssetsPage = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showAssetForm, setShowAssetForm] = useState(false);
 
   // Mock data for different categories
   const mockData = {
@@ -259,10 +261,15 @@ const AssetsPage = () => {
                             Track
                           </Button>
                         )}
-                        <Button size="sm" variant="outline" className="gap-1">
-                          <Edit className="h-3 w-3" />
-                          Update
-                        </Button>
+                         <Button 
+                           size="sm" 
+                           variant="outline" 
+                           className="gap-1"
+                           onClick={() => setShowAssetForm(true)}
+                         >
+                           <Edit className="h-3 w-3" />
+                           Update
+                         </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -288,6 +295,10 @@ const AssetsPage = () => {
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {showAssetForm && (
+        <AssetTypeSelector onClose={() => setShowAssetForm(false)} />
       )}
     </div>
   );

@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { HandOverForm } from "@/components/forms/HandOverForm";
+import { ReturnAssetForm } from "@/components/forms/ReturnAssetForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Eye, Plus } from "lucide-react";
+import { Eye, Plus, RotateCcw, Edit } from "lucide-react";
 
 interface HandOverRecord {
   id: string;
@@ -71,6 +72,8 @@ const mockHandOverData: HandOverRecord[] = [
 const HandOverPage = () => {
   const [showHandOverForm, setShowHandOverForm] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showReturnForm, setShowReturnForm] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState<HandOverRecord | null>(null);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -123,6 +126,7 @@ const HandOverPage = () => {
                       <TableHead>Picture</TableHead>
                       <TableHead>Purpose</TableHead>
                       <TableHead>Status</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -163,6 +167,31 @@ const HandOverPage = () => {
                           </div>
                         </TableCell>
                         <TableCell>{getStatusBadge(record.status)}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            {record.status === "Active" && (
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedRecord(record);
+                                  setShowReturnForm(true);
+                                }}
+                              >
+                                <RotateCcw className="h-3 w-3 mr-1" />
+                                Return
+                              </Button>
+                            )}
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => setShowHandOverForm(true)}
+                            >
+                              <Edit className="h-3 w-3 mr-1" />
+                              Update
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -175,6 +204,17 @@ const HandOverPage = () => {
 
       {showHandOverForm && (
         <HandOverForm onClose={() => setShowHandOverForm(false)} />
+      )}
+
+      {showReturnForm && selectedRecord && (
+        <ReturnAssetForm 
+          onClose={() => {
+            setShowReturnForm(false);
+            setSelectedRecord(null);
+          }}
+          assetName={selectedRecord.assetName}
+          handOverId={selectedRecord.id}
+        />
       )}
 
       {selectedImage && (
