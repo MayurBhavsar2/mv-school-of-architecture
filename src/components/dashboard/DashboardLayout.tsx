@@ -27,6 +27,10 @@ export const DashboardLayout = ({ children, onAddAsset }: DashboardLayoutProps) 
                 <Settings className="h-4 w-4 mr-2" />
                 Hand-Over
               </Button>
+              <Button variant="outline" size="sm" onClick={() => window.location.href = '/principal'}>
+                <Settings className="h-4 w-4 mr-2" />
+                Principal Dashboard
+              </Button>
               <Button variant="outline" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
                 Settings
