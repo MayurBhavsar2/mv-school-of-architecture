@@ -10,6 +10,7 @@ import AlertsPage from "./pages/AlertsPage";
 import HandOverPage from "./pages/HandOverPage";
 import PrincipalDashboard from "./pages/PrincipalDashboard";
 import PrincipalAssetsPage from "./pages/PrincipalAssetsPage";
+import PrincipalAuditPage from "./pages/PrincipalAuditPage";
 
 const queryClient = new QueryClient();
 
@@ -24,8 +25,9 @@ const App = () => (
           <Route path="/assets/:category" element={<AssetsPage />} />
           <Route path="/alerts" element={<AlertsPage />} />
           <Route path="/handover" element={<HandOverPage />} />
-          <Route path="/principal" element={<PrincipalDashboard />} />
-          <Route path="/principal/assets" element={<PrincipalAssetsPage />} />
+        <Route path="/principal" element={<PrincipalDashboard />} />
+        <Route path="/principal/assets" element={<PrincipalAssetsPage />} />
+        <Route path="/principal/audit" element={<PrincipalAuditPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
