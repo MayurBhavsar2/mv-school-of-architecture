@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Filter, FileCheck, AlertTriangle, Package, Wrench, TrendingDown, Users } from "lucide-react";
+import { Bell, Filter, FileCheck, AlertTriangle, Package, Wrench, TrendingDown, Users, Calendar, ExternalLink } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -12,6 +12,8 @@ const PrincipalDashboard = () => {
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showPendingApprovals, setShowPendingApprovals] = useState(false);
+  const [showMaintenanceDetails, setShowMaintenanceDetails] = useState(false);
+  const [showLowStockDetails, setShowLowStockDetails] = useState(false);
   const [assetFilter, setAssetFilter] = useState("all");
 
   // Mock notifications data
@@ -67,6 +69,68 @@ const PrincipalDashboard = () => {
       expectedReturn: "2024-06-30",
       purpose: "Student training program",
       status: "pending"
+    }
+  ];
+
+  // Mock maintenance due data
+  const maintenanceDue = [
+    {
+      id: "AST001",
+      name: "Microscope",
+      type: "Physical",
+      department: "Biology Lab",
+      dueDate: "2024-02-15",
+      overdue: false,
+      priority: "High"
+    },
+    {
+      id: "AST004",
+      name: "Server Rack",
+      type: "Digital",
+      department: "IT Department",
+      dueDate: "2024-02-10",
+      overdue: true,
+      priority: "Critical"
+    },
+    {
+      id: "AST005",
+      name: "Air Conditioning Unit",
+      type: "Physical",
+      department: "Main Building",
+      dueDate: "2024-02-20",
+      overdue: false,
+      priority: "Medium"
+    }
+  ];
+
+  // Mock low stock data
+  const lowStockItems = [
+    {
+      id: "AST020",
+      name: "Printer Paper",
+      currentStock: 5,
+      threshold: 10,
+      type: "Consumable",
+      department: "General Office",
+      urgency: "Medium"
+    },
+    {
+      id: "AST021",
+      name: "Whiteboard Markers",
+      currentStock: 2,
+      threshold: 15,
+      type: "Consumable",
+      department: "All Classrooms",
+      urgency: "High"
+    },
+    {
+      id: "AST022",
+      name: "Network Cables",
+      currentStock: 3,
+      threshold: 20,
+      type: "Physical",
+      department: "IT Department",
+      urgency: "High"
     }
   ];
 
@@ -129,25 +193,31 @@ const PrincipalDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/principal/maintenance')}>
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowMaintenanceDetails(true)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Maintenance Due</CardTitle>
               <Wrench className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">5</div>
+              <div className="text-2xl font-bold">{maintenanceDue.length}</div>
               <p className="text-xs text-muted-foreground">Assets requiring maintenance</p>
+              <div className="text-xs text-red-500 mt-1">
+                {maintenanceDue.filter(item => item.overdue).length} overdue
+              </div>
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/principal/low-stock')}>
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowLowStockDetails(true)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Low Stock</CardTitle>
               <TrendingDown className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">3</div>
+              <div className="text-2xl font-bold">{lowStockItems.length}</div>
               <p className="text-xs text-muted-foreground">Items below threshold</p>
+              <div className="text-xs text-orange-500 mt-1">
+                {lowStockItems.filter(item => item.urgency === "High").length} urgent
+              </div>
             </CardContent>
           </Card>
 
@@ -273,6 +343,114 @@ const PrincipalDashboard = () => {
                             Reject
                           </Button>
                         </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Maintenance Details Dialog */}
+      {showMaintenanceDetails && (
+        <Dialog open={true} onOpenChange={() => setShowMaintenanceDetails(false)}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Maintenance Due Assets</DialogTitle>
+            </DialogHeader>
+            <div className="max-h-96 overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Asset ID</TableHead>
+                    <TableHead>Asset Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Department</TableHead>
+                    <TableHead>Due Date</TableHead>
+                    <TableHead>Priority</TableHead>
+                    <TableHead>Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {maintenanceDue.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.id}</TableCell>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{item.type}</Badge>
+                      </TableCell>
+                      <TableCell>{item.department}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          {item.dueDate}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={item.priority === "Critical" ? "destructive" : 
+                                 item.priority === "High" ? "default" : "secondary"}
+                        >
+                          {item.priority}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {item.overdue ? (
+                          <Badge variant="destructive">Overdue</Badge>
+                        ) : (
+                          <Badge variant="outline">Due Soon</Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Low Stock Details Dialog */}
+      {showLowStockDetails && (
+        <Dialog open={true} onOpenChange={() => setShowLowStockDetails(false)}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Low Stock Items</DialogTitle>
+            </DialogHeader>
+            <div className="max-h-96 overflow-y-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Asset ID</TableHead>
+                    <TableHead>Item Name</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Department</TableHead>
+                    <TableHead>Current Stock</TableHead>
+                    <TableHead>Threshold</TableHead>
+                    <TableHead>Urgency</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {lowStockItems.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.id}</TableCell>
+                      <TableCell>{item.name}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{item.type}</Badge>
+                      </TableCell>
+                      <TableCell>{item.department}</TableCell>
+                      <TableCell>
+                        <span className="font-medium text-red-500">{item.currentStock}</span>
+                      </TableCell>
+                      <TableCell>{item.threshold}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          variant={item.urgency === "High" ? "destructive" : "default"}
+                        >
+                          {item.urgency}
+                        </Badge>
                       </TableCell>
                     </TableRow>
                   ))}

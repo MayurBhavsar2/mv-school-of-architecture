@@ -20,6 +20,7 @@ const PrincipalAuditPage = () => {
   const form = useForm({
     defaultValues: {
       type: "",
+      assetType: "",
       auditorName: "",
       auditorEmail: "",
       auditorPhone: "",
@@ -71,7 +72,7 @@ const PrincipalAuditPage = () => {
 
   const handleAssignAuditor = (data: any) => {
     console.log("Assigning auditor:", data);
-    toast.success("Auditor assigned successfully!");
+    toast.success("Audit assignment sent to auditor successfully!");
     setShowAssignForm(false);
     form.reset();
   };
@@ -260,6 +261,30 @@ const PrincipalAuditPage = () => {
                     )}
                   />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="assetType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Asset Type to Audit</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select asset type to audit" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="physical">Physical Assets</SelectItem>
+                          <SelectItem value="digital">Digital Assets</SelectItem>
+                          <SelectItem value="consumable">Consumable Assets</SelectItem>
+                          <SelectItem value="all">All Asset Types</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
