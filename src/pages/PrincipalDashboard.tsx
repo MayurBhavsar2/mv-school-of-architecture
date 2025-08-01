@@ -2,11 +2,14 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Filter, FileCheck, AlertTriangle, Package, Wrench, TrendingDown, Users, Calendar, ExternalLink } from "lucide-react";
+import { Bell, Filter, FileCheck, AlertTriangle, Package, Wrench, TrendingDown, Users, Calendar, ExternalLink, UserCheck, RefreshCw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 const PrincipalDashboard = () => {
   const navigate = useNavigate();
@@ -14,7 +17,13 @@ const PrincipalDashboard = () => {
   const [showPendingApprovals, setShowPendingApprovals] = useState(false);
   const [showMaintenanceDetails, setShowMaintenanceDetails] = useState(false);
   const [showLowStockDetails, setShowLowStockDetails] = useState(false);
+  const [showAssetAssignments, setShowAssetAssignments] = useState(false);
+  const [showReassignDialog, setShowReassignDialog] = useState(false);
+  const [selectedStaffAssets, setSelectedStaffAssets] = useState<any[]>([]);
+  const [selectedStaffName, setSelectedStaffName] = useState("");
+  const [newAssignee, setNewAssignee] = useState("");
   const [assetFilter, setAssetFilter] = useState("all");
+  const { toast } = useToast();
 
   // Mock notifications data
   const notifications = [
@@ -134,6 +143,61 @@ const PrincipalDashboard = () => {
     }
   ];
 
+  // Mock asset assignments data
+  const [assetAssignments, setAssetAssignments] = useState([
+    {
+      id: "AST001",
+      name: "Microscope",
+      type: "Physical",
+      department: "Biology Lab",
+      hodInCharge: "Dr. Smith",
+      facultyInCharge: "Prof. Johnson",
+      assignedDate: "2024-01-15"
+    },
+    {
+      id: "AST002",
+      name: "Projector",
+      type: "Physical", 
+      department: "Physics Lab",
+      hodInCharge: "Dr. Brown",
+      facultyInCharge: "Prof. Davis",
+      assignedDate: "2024-01-10"
+    },
+    {
+      id: "AST003",
+      name: "AutoCAD License",
+      type: "Digital",
+      department: "Engineering",
+      hodInCharge: "Dr. Wilson",
+      facultyInCharge: "Prof. Miller",
+      assignedDate: "2024-01-20"
+    },
+    {
+      id: "AST004",
+      name: "Server Rack",
+      type: "Physical",
+      department: "IT Department", 
+      hodInCharge: "Dr. Taylor",
+      facultyInCharge: "Prof. Anderson",
+      assignedDate: "2024-01-05"
+    },
+    {
+      id: "AST005",
+      name: "Chemistry Equipment Set",
+      type: "Physical",
+      department: "Chemistry Lab",
+      hodInCharge: "Dr. Smith",
+      facultyInCharge: "Prof. White",
+      assignedDate: "2024-01-12"
+    }
+  ]);
+
+  // Get unique staff members
+  const allStaff = Array.from(new Set([
+    ...assetAssignments.map(a => a.hodInCharge),
+    ...assetAssignments.map(a => a.facultyInCharge)
+  ])).sort();
+
   const unreadCount = notifications.filter(n => n.status === "unread").length;
 
   const getNotificationIcon = (type: string) => {
@@ -149,6 +213,48 @@ const PrincipalDashboard = () => {
   const handleApproval = (id: string, action: "approve" | "reject") => {
     // Handle approval logic here
     console.log(`${action} approval for ${id}`);
+  };
+
+  const handleStaffSelection = (staffName: string) => {
+    const staffAssets = assetAssignments.filter(
+      asset => asset.hodInCharge === staffName || asset.facultyInCharge === staffName
+    );
+    setSelectedStaffAssets(staffAssets);
+    setSelectedStaffName(staffName);
+    setShowReassignDialog(true);
+  };
+
+  const handleReassignment = () => {
+    if (!newAssignee) {
+      toast({
+        title: "Error",
+        description: "Please select a new assignee",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Update assignments for the selected staff
+    const updatedAssignments = assetAssignments.map(asset => {
+      if (asset.hodInCharge === selectedStaffName) {
+        return { ...asset, hodInCharge: newAssignee };
+      }
+      if (asset.facultyInCharge === selectedStaffName) {
+        return { ...asset, facultyInCharge: newAssignee };
+      }
+      return asset;
+    });
+
+    setAssetAssignments(updatedAssignments);
+    setShowReassignDialog(false);
+    setNewAssignee("");
+    setSelectedStaffAssets([]);
+    setSelectedStaffName("");
+
+    toast({
+      title: "Success",
+      description: `Assets reassigned from ${selectedStaffName} to ${newAssignee}`,
+    });
   };
 
   return (
@@ -181,7 +287,7 @@ const PrincipalDashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
           <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/principal/assets')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
@@ -240,6 +346,17 @@ const PrincipalDashboard = () => {
             <CardContent>
               <div className="text-2xl font-bold">12</div>
               <p className="text-xs text-muted-foreground">Items to audit</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowAssetAssignments(true)}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Asset Assignments</CardTitle>
+              <UserCheck className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{assetAssignments.length}</div>
+              <p className="text-xs text-muted-foreground">Staff asset assignments</p>
             </CardContent>
           </Card>
         </div>
@@ -456,6 +573,196 @@ const PrincipalDashboard = () => {
                   ))}
                 </TableBody>
               </Table>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Asset Assignments Dialog */}
+      {showAssetAssignments && (
+        <Dialog open={true} onOpenChange={() => setShowAssetAssignments(false)}>
+          <DialogContent className="max-w-6xl">
+            <DialogHeader>
+              <DialogTitle>Asset Assignments Management</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {/* Staff Selection Section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Staff Asset Overview</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-sm text-muted-foreground mb-4">
+                    Select a staff member to view their assigned assets and reassign if they're leaving:
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    {allStaff.map((staff) => {
+                      const staffAssetCount = assetAssignments.filter(
+                        asset => asset.hodInCharge === staff || asset.facultyInCharge === staff
+                      ).length;
+                      
+                      return (
+                        <Button
+                          key={staff}
+                          variant="outline"
+                          className="p-4 h-auto flex flex-col items-center gap-2"
+                          onClick={() => handleStaffSelection(staff)}
+                        >
+                          <Users className="h-4 w-4" />
+                          <span className="font-medium">{staff}</span>
+                          <Badge variant="secondary" className="text-xs">
+                            {staffAssetCount} assets
+                          </Badge>
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Asset Assignments Table */}
+              <div className="max-h-96 overflow-y-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Asset ID</TableHead>
+                      <TableHead>Asset Name</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Department</TableHead>
+                      <TableHead>HOD In Charge</TableHead>
+                      <TableHead>Faculty In Charge</TableHead>
+                      <TableHead>Assigned Date</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {assetAssignments.map((assignment) => (
+                      <TableRow key={assignment.id}>
+                        <TableCell className="font-medium">{assignment.id}</TableCell>
+                        <TableCell>{assignment.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{assignment.type}</Badge>
+                        </TableCell>
+                        <TableCell>{assignment.department}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto text-primary"
+                            onClick={() => handleStaffSelection(assignment.hodInCharge)}
+                          >
+                            {assignment.hodInCharge}
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="link"
+                            className="p-0 h-auto text-primary"
+                            onClick={() => handleStaffSelection(assignment.facultyInCharge)}
+                          >
+                            {assignment.facultyInCharge}
+                          </Button>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4" />
+                            {assignment.assignedDate}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Reassignment Dialog */}
+      {showReassignDialog && (
+        <Dialog open={true} onOpenChange={() => setShowReassignDialog(false)}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Reassign Assets - {selectedStaffName}</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              {/* Current Assets */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Assets Currently Assigned to {selectedStaffName}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="max-h-64 overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Asset ID</TableHead>
+                          <TableHead>Asset Name</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Department</TableHead>
+                          <TableHead>Role</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {selectedStaffAssets.map((asset) => (
+                          <TableRow key={asset.id}>
+                            <TableCell className="font-medium">{asset.id}</TableCell>
+                            <TableCell>{asset.name}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline">{asset.type}</Badge>
+                            </TableCell>
+                            <TableCell>{asset.department}</TableCell>
+                            <TableCell>
+                              <Badge variant="secondary">
+                                {asset.hodInCharge === selectedStaffName ? "HOD" : "Faculty"}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Reassignment Form */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Reassign to New Staff Member</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="newAssignee">Select New Assignee</Label>
+                    <Select onValueChange={setNewAssignee} value={newAssignee}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose staff member..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {allStaff
+                          .filter(staff => staff !== selectedStaffName)
+                          .map((staff) => (
+                            <SelectItem key={staff} value={staff}>
+                              {staff}
+                            </SelectItem>
+                          ))}
+                        <SelectItem value="Dr. New Faculty">Dr. New Faculty</SelectItem>
+                        <SelectItem value="Prof. Replacement">Prof. Replacement</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="flex gap-4 pt-4">
+                    <Button onClick={handleReassignment} className="flex items-center gap-2">
+                      <RefreshCw className="h-4 w-4" />
+                      Reassign All Assets
+                    </Button>
+                    <Button variant="outline" onClick={() => setShowReassignDialog(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </DialogContent>
         </Dialog>
