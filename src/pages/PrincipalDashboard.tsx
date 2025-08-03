@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Bell, Filter, FileCheck, AlertTriangle, Package, Wrench, TrendingDown, Users, Calendar, ExternalLink, UserCheck, RefreshCw } from "lucide-react";
+import { Bell, Filter, FileCheck, AlertTriangle, Package, Wrench, TrendingDown, Users, Calendar, ExternalLink, UserCheck, RefreshCw, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -19,6 +19,7 @@ const PrincipalDashboard = () => {
   const [showLowStockDetails, setShowLowStockDetails] = useState(false);
   const [showAssetAssignments, setShowAssetAssignments] = useState(false);
   const [showReassignDialog, setShowReassignDialog] = useState(false);
+  const [showPurchaseRequests, setShowPurchaseRequests] = useState(false);
   const [selectedStaffAssets, setSelectedStaffAssets] = useState<any[]>([]);
   const [selectedStaffName, setSelectedStaffName] = useState("");
   const [newAssignee, setNewAssignee] = useState("");
@@ -143,6 +144,38 @@ const PrincipalDashboard = () => {
     }
   ];
 
+  // Mock purchase requests data
+  const [purchaseRequests, setPurchaseRequests] = useState([
+    {
+      id: "PR001",
+      assetName: "High-End Workstation",
+      assetType: "Physical",
+      department: "Computer Science",
+      hodName: "Dr. Smith",
+      estimatedCost: "₹1,50,000",
+      priority: "High",
+      requestDate: "2024-03-15",
+      justification: "Required for advanced computing research and student projects",
+      status: "pending",
+      description: "Intel i9 processor, 32GB RAM, RTX 4090 GPU",
+      vendor: "Dell Technologies"
+    },
+    {
+      id: "PR002",
+      assetName: "AutoCAD Licenses",
+      assetType: "Digital",
+      department: "Mechanical",
+      hodName: "Dr. Brown",
+      estimatedCost: "₹2,00,000",
+      priority: "Medium",
+      requestDate: "2024-03-14",
+      justification: "Software licenses for 50 students in mechanical design course",
+      status: "pending",
+      description: "Annual subscription for 50 users",
+      vendor: "Autodesk"
+    }
+  ]);
+
   // Mock asset assignments data
   const [assetAssignments, setAssetAssignments] = useState([
     {
@@ -257,6 +290,30 @@ const PrincipalDashboard = () => {
     });
   };
 
+  const handlePurchaseApproval = (id: string, action: "approve" | "reject") => {
+    const updatedRequests = purchaseRequests.map(request => {
+      if (request.id === id) {
+        return { ...request, status: action === "approve" ? "approved" : "rejected" };
+      }
+      return request;
+    });
+    
+    setPurchaseRequests(updatedRequests);
+    
+    const request = purchaseRequests.find(r => r.id === id);
+    if (action === "approve") {
+      toast({
+        title: "Purchase Request Approved",
+        description: `${request?.assetName} has been approved and sent to Admin for purchase.`
+      });
+    } else {
+      toast({
+        title: "Purchase Request Rejected",
+        description: `${request?.assetName} request has been rejected.`
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -287,7 +344,7 @@ const PrincipalDashboard = () => {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-6">
           <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => navigate('/principal/assets')}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Assets</CardTitle>
@@ -357,6 +414,20 @@ const PrincipalDashboard = () => {
             <CardContent>
               <div className="text-2xl font-bold">{assetAssignments.length}</div>
               <p className="text-xs text-muted-foreground">Staff asset assignments</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowPurchaseRequests(true)}>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Purchase Requests</CardTitle>
+              <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{purchaseRequests.filter(r => r.status === "pending").length}</div>
+              <p className="text-xs text-muted-foreground">Pending approval</p>
+              <div className="text-xs text-blue-500 mt-1">
+                {purchaseRequests.filter(r => r.status === "approved").length} approved
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -578,8 +649,83 @@ const PrincipalDashboard = () => {
         </Dialog>
       )}
 
-      {/* Asset Assignments Dialog */}
-      {showAssetAssignments && (
+        {/* Purchase Requests Dialog */}
+        {showPurchaseRequests && (
+          <Dialog open={true} onOpenChange={() => setShowPurchaseRequests(false)}>
+            <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  Purchase Requests
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                {purchaseRequests.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-8">No purchase requests</p>
+                ) : (
+                  purchaseRequests.map((request) => (
+                    <div key={request.id} className="border rounded-lg p-4 space-y-4">
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-semibold text-lg">{request.assetName}</h3>
+                            <Badge variant="outline">{request.assetType}</Badge>
+                            <Badge variant={
+                              request.priority === "Urgent" ? "destructive" :
+                              request.priority === "High" ? "destructive" :
+                              request.priority === "Medium" ? "secondary" : "outline"
+                            }>
+                              {request.priority}
+                            </Badge>
+                            <Badge variant={
+                              request.status === "approved" ? "default" :
+                              request.status === "rejected" ? "destructive" : "secondary"
+                            }>
+                              {request.status}
+                            </Badge>
+                          </div>
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <p><strong>Request ID:</strong> {request.id}</p>
+                            <p><strong>Department:</strong> {request.department}</p>
+                            <p><strong>HOD:</strong> {request.hodName}</p>
+                            <p><strong>Request Date:</strong> {request.requestDate}</p>
+                            <p><strong>Estimated Cost:</strong> {request.estimatedCost}</p>
+                            <p><strong>Vendor:</strong> {request.vendor}</p>
+                          </div>
+                          <div className="space-y-2">
+                            <p><strong>Description:</strong> {request.description}</p>
+                            <p><strong>Justification:</strong> {request.justification}</p>
+                          </div>
+                        </div>
+                      </div>
+                      {request.status === "pending" && (
+                        <div className="flex gap-2 pt-4 border-t">
+                          <Button 
+                            size="sm" 
+                            onClick={() => handlePurchaseApproval(request.id, "approve")}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            Approve & Send to Admin
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="destructive"
+                            onClick={() => handlePurchaseApproval(request.id, "reject")}
+                          >
+                            Reject
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
+
+        {/* Asset Assignments Dialog */}
+        {showAssetAssignments && (
         <Dialog open={true} onOpenChange={() => setShowAssetAssignments(false)}>
           <DialogContent className="max-w-6xl">
             <DialogHeader>

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Bell, Package, CheckCircle, Clock, FileText, AlertTriangle, User, Wrench } from "lucide-react";
+import { Bell, Package, CheckCircle, Clock, FileText, AlertTriangle, User, Wrench, Plus, ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
 
 const HODDashboard = () => {
@@ -17,6 +17,18 @@ const HODDashboard = () => {
   const [auditStatus, setAuditStatus] = useState("pending");
   const [auditComments, setAuditComments] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showPurchaseRequest, setShowPurchaseRequest] = useState(false);
+  const [purchaseFormData, setPurchaseFormData] = useState({
+    assetName: "",
+    assetType: "",
+    description: "",
+    estimatedCost: "",
+    justification: "",
+    department: "Computer Science",
+    priority: "Medium",
+    vendor: "",
+    specifications: ""
+  });
 
   // Mock data for HOD assigned assets
   const assignedAssets = [
@@ -186,6 +198,27 @@ const HODDashboard = () => {
     }
   };
 
+  const handlePurchaseRequest = () => {
+    if (!purchaseFormData.assetName || !purchaseFormData.assetType || !purchaseFormData.estimatedCost) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
+    toast.success(`Purchase request submitted for ${purchaseFormData.assetName}. Principal will be notified for approval.`);
+    setShowPurchaseRequest(false);
+    setPurchaseFormData({
+      assetName: "",
+      assetType: "",
+      description: "",
+      estimatedCost: "",
+      justification: "",
+      department: "Computer Science",
+      priority: "Medium",
+      vendor: "",
+      specifications: ""
+    });
+  };
+
   const pendingAudits = auditAssignments.filter(audit => audit.status === "Pending").length;
   const inProgressAudits = auditAssignments.filter(audit => audit.status === "In Progress").length;
   const completedAudits = auditAssignments.filter(audit => audit.status === "Completed").length;
@@ -201,6 +234,14 @@ const HODDashboard = () => {
               <p className="text-muted-foreground">Computer Science Department</p>
             </div>
             <div className="flex items-center gap-4">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowPurchaseRequest(true)}
+              >
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                Purchase Request
+              </Button>
               <Button 
                 variant="outline" 
                 size="sm"
@@ -406,6 +447,143 @@ const HODDashboard = () => {
               <Button variant="outline" onClick={() => setShowNotifications(false)}>
                 Close
               </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Purchase Request Dialog */}
+        <Dialog open={showPurchaseRequest} onOpenChange={setShowPurchaseRequest}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <ShoppingCart className="h-5 w-5" />
+                Asset Purchase Request
+              </DialogTitle>
+              <DialogDescription>
+                Submit a request to purchase new assets for your department
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Asset Name *</label>
+                  <input
+                    type="text"
+                    value={purchaseFormData.assetName}
+                    onChange={(e) => setPurchaseFormData(prev => ({ ...prev, assetName: e.target.value }))}
+                    className="w-full px-3 py-2 border rounded-md"
+                    placeholder="Enter asset name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Asset Type *</label>
+                  <Select value={purchaseFormData.assetType} onValueChange={(value) => setPurchaseFormData(prev => ({ ...prev, assetType: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select asset type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Physical">Physical</SelectItem>
+                      <SelectItem value="Digital">Digital</SelectItem>
+                      <SelectItem value="Consumable">Consumable</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Description</label>
+                <Textarea
+                  value={purchaseFormData.description}
+                  onChange={(e) => setPurchaseFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Detailed description of the asset"
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Estimated Cost *</label>
+                  <input
+                    type="number"
+                    value={purchaseFormData.estimatedCost}
+                    onChange={(e) => setPurchaseFormData(prev => ({ ...prev, estimatedCost: e.target.value }))}
+                    className="w-full px-3 py-2 border rounded-md"
+                    placeholder="₹ 0.00"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Priority</label>
+                  <Select value={purchaseFormData.priority} onValueChange={(value) => setPurchaseFormData(prev => ({ ...prev, priority: value }))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Low">Low</SelectItem>
+                      <SelectItem value="Medium">Medium</SelectItem>
+                      <SelectItem value="High">High</SelectItem>
+                      <SelectItem value="Urgent">Urgent</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Justification</label>
+                <Textarea
+                  value={purchaseFormData.justification}
+                  onChange={(e) => setPurchaseFormData(prev => ({ ...prev, justification: e.target.value }))}
+                  placeholder="Why is this asset needed? How will it benefit the department?"
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Preferred Vendor</label>
+                  <input
+                    type="text"
+                    value={purchaseFormData.vendor}
+                    onChange={(e) => setPurchaseFormData(prev => ({ ...prev, vendor: e.target.value }))}
+                    className="w-full px-3 py-2 border rounded-md"
+                    placeholder="Vendor name (optional)"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Department</label>
+                  <Select value={purchaseFormData.department} onValueChange={(value) => setPurchaseFormData(prev => ({ ...prev, department: value }))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Computer Science">Computer Science</SelectItem>
+                      <SelectItem value="Mechanical">Mechanical</SelectItem>
+                      <SelectItem value="Electrical">Electrical</SelectItem>
+                      <SelectItem value="Civil">Civil</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Technical Specifications</label>
+                <Textarea
+                  value={purchaseFormData.specifications}
+                  onChange={(e) => setPurchaseFormData(prev => ({ ...prev, specifications: e.target.value }))}
+                  placeholder="Technical specifications, requirements, or additional details"
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <Button onClick={handlePurchaseRequest} className="flex-1">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Submit Purchase Request
+                </Button>
+                <Button variant="outline" onClick={() => setShowPurchaseRequest(false)}>
+                  Cancel
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
