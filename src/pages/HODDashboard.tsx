@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { Bell, Package, CheckCircle, Clock, FileText, AlertTriangle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Bell, Package, CheckCircle, Clock, FileText, AlertTriangle, User, Wrench } from "lucide-react";
 import { toast } from "sonner";
 
 const HODDashboard = () => {
@@ -15,6 +16,7 @@ const HODDashboard = () => {
   const [auditFormData, setAuditFormData] = useState<any>({});
   const [auditStatus, setAuditStatus] = useState("pending");
   const [auditComments, setAuditComments] = useState("");
+  const [showNotifications, setShowNotifications] = useState(false);
 
   // Mock data for HOD assigned assets
   const assignedAssets = [
@@ -88,6 +90,48 @@ const HODDashboard = () => {
     }
   ];
 
+  // Mock notification data
+  const notifications = [
+    {
+      id: "NOT001",
+      type: "New Asset Assignment",
+      title: "New Asset Assigned",
+      message: "You have been assigned to oversee the new Microscope (AST004) in Lab 205.",
+      icon: User,
+      timestamp: "2 hours ago",
+      isRead: false
+    },
+    {
+      id: "NOT002", 
+      type: "Audit Assignment",
+      title: "Audit Assignment from Principal",
+      message: "You have been assigned to audit the 3D Printer (AST002) by March 25, 2024.",
+      icon: FileText,
+      timestamp: "1 day ago",
+      isRead: false
+    },
+    {
+      id: "NOT003",
+      type: "Maintenance Alert",
+      title: "Maintenance Due Soon",
+      message: "Dell Laptop (AST001) maintenance is due on March 30, 2024.",
+      icon: Wrench,
+      timestamp: "3 days ago",
+      isRead: true
+    },
+    {
+      id: "NOT004",
+      type: "Asset Status Update",
+      title: "Asset Status Changed",
+      message: "Whiteboard Markers (AST003) status updated to Low Stock.",
+      icon: AlertTriangle,
+      timestamp: "1 week ago",
+      isRead: true
+    }
+  ];
+
+  const unreadNotifications = notifications.filter(n => !n.isRead).length;
+
   const getAuditFieldsForAssetType = (assetType: string) => {
     switch (assetType) {
       case "Physical":
@@ -157,11 +201,15 @@ const HODDashboard = () => {
               <p className="text-muted-foreground">Computer Science Department</p>
             </div>
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowNotifications(true)}
+              >
                 <Bell className="h-4 w-4 mr-2" />
                 Notifications
-                {pendingAudits > 0 && (
-                  <Badge variant="destructive" className="ml-2">{pendingAudits}</Badge>
+                {unreadNotifications > 0 && (
+                  <Badge variant="destructive" className="ml-2">{unreadNotifications}</Badge>
                 )}
               </Button>
             </div>
@@ -305,6 +353,62 @@ const HODDashboard = () => {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Notifications Dialog */}
+        <Dialog open={showNotifications} onOpenChange={setShowNotifications}>
+          <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Notifications
+              </DialogTitle>
+              <DialogDescription>
+                Recent notifications and alerts
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              {notifications.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No notifications</p>
+              ) : (
+                notifications.map((notification) => {
+                  const IconComponent = notification.icon;
+                  return (
+                    <div 
+                      key={notification.id} 
+                      className={`p-4 rounded-lg border ${!notification.isRead ? 'bg-primary/5 border-primary/20' : 'bg-muted/30'}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-full ${!notification.isRead ? 'bg-primary/10' : 'bg-muted'}`}>
+                          <IconComponent className="h-4 w-4" />
+                        </div>
+                        <div className="flex-1 space-y-1">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-medium text-sm">{notification.title}</h4>
+                            {!notification.isRead && (
+                              <Badge variant="destructive" className="text-xs">New</Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground">{notification.message}</p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">{notification.timestamp}</span>
+                            <Badge variant="outline" className="text-xs">{notification.type}</Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+            
+            <div className="flex justify-end pt-4 border-t">
+              <Button variant="outline" onClick={() => setShowNotifications(false)}>
+                Close
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Audit Form Dialog */}
         <Dialog open={!!selectedAudit} onOpenChange={() => setSelectedAudit(null)}>
