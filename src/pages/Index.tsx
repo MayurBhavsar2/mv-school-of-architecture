@@ -9,12 +9,21 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ShoppingCart, CheckCircle, XCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ShoppingCart, CheckCircle, XCircle, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 const Index = () => {
   const [showAssetForm, setShowAssetForm] = useState(false);
   const [showPurchaseRequests, setShowPurchaseRequests] = useState(false);
+  const [showQuotationCollection, setShowQuotationCollection] = useState(false);
+  const [selectedRequestForQuotation, setSelectedRequestForQuotation] = useState<string | null>(null);
+  const [vendors, setVendors] = useState([
+    { name: "", file: null },
+    { name: "", file: null },
+    { name: "", file: null }
+  ]);
   
   // Mock approved purchase requests data
   const [approvedPurchaseRequests, setApprovedPurchaseRequests] = useState([
@@ -65,8 +74,38 @@ const Index = () => {
   ]);
 
   const handleCollectQuotations = (id: string) => {
+    setSelectedRequestForQuotation(id);
+    setShowQuotationCollection(true);
+    setVendors([
+      { name: "", file: null },
+      { name: "", file: null },
+      { name: "", file: null }
+    ]);
+  };
+
+  const handleVendorNameChange = (index: number, name: string) => {
+    setVendors(prev => prev.map((vendor, i) => 
+      i === index ? { ...vendor, name } : vendor
+    ));
+  };
+
+  const handleFileUpload = (index: number, file: File | null) => {
+    setVendors(prev => prev.map((vendor, i) => 
+      i === index ? { ...vendor, file } : vendor
+    ));
+  };
+
+  const handleSubmitQuotations = () => {
+    if (!selectedRequestForQuotation) return;
+    
+    const incompleteVendors = vendors.filter(v => !v.name.trim() || !v.file);
+    if (incompleteVendors.length > 0) {
+      toast.error("Please provide vendor names and upload files for all 3 vendors");
+      return;
+    }
+
     const updatedRequests = approvedPurchaseRequests.map(request => {
-      if (request.id === id) {
+      if (request.id === selectedRequestForQuotation) {
         return { ...request, quotationStatus: "collected" };
       }
       return request;
@@ -74,8 +113,25 @@ const Index = () => {
     
     setApprovedPurchaseRequests(updatedRequests);
     
-    const request = approvedPurchaseRequests.find(r => r.id === id);
-    toast.success(`Collecting quotations for ${request?.assetName}. Will send to Principal once ready.`);
+    // Add mock quotation data
+    const newQuotations = {
+      requestId: selectedRequestForQuotation,
+      quotations: vendors.map((vendor, index) => ({
+        vendor: vendor.name,
+        cost: `₹${(150000 + Math.random() * 100000).toFixed(0)}`,
+        deliveryTime: `${5 + Math.floor(Math.random() * 10)} days`,
+        specifications: "As per requirements",
+        file: vendor.file
+      }))
+    };
+    
+    setQuotations(prev => [...prev.filter(q => q.requestId !== selectedRequestForQuotation), newQuotations]);
+    
+    const request = approvedPurchaseRequests.find(r => r.id === selectedRequestForQuotation);
+    toast.success(`Quotations collected for ${request?.assetName} from all 3 vendors.`);
+    
+    setShowQuotationCollection(false);
+    setSelectedRequestForQuotation(null);
   };
 
   const handleSendQuotationsToPrincipal = (id: string) => {
@@ -277,6 +333,64 @@ const Index = () => {
                 </div>
               ))
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Quotation Collection Dialog */}
+      <Dialog open={showQuotationCollection} onOpenChange={setShowQuotationCollection}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Upload className="h-5 w-5" />
+              Collect Quotations from 3 Vendors
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            {vendors.map((vendor, index) => (
+              <div key={index} className="border rounded-lg p-4 space-y-4">
+                <h3 className="font-semibold text-lg">Vendor {index + 1}</h3>
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor={`vendor-name-${index}`}>Vendor Name</Label>
+                    <Input
+                      id={`vendor-name-${index}`}
+                      placeholder="Enter vendor name"
+                      value={vendor.name}
+                      onChange={(e) => handleVendorNameChange(index, e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`vendor-file-${index}`}>Upload Quotation File</Label>
+                    <Input
+                      id={`vendor-file-${index}`}
+                      type="file"
+                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                      onChange={(e) => handleFileUpload(index, e.target.files?.[0] || null)}
+                    />
+                    {vendor.file && (
+                      <p className="text-sm text-green-600 mt-1">
+                        File uploaded: {vendor.file.name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div className="flex gap-2 pt-4">
+              <Button 
+                onClick={handleSubmitQuotations}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                Submit All Quotations
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setShowQuotationCollection(false)}
+              >
+                Cancel
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
