@@ -152,13 +152,12 @@ const PrincipalDashboard = () => {
       assetType: "Physical",
       department: "Computer Science",
       hodName: "Dr. Smith",
-      estimatedCost: "₹1,50,000",
+      approxCosting: "₹1,50,000",
       priority: "High",
       requestDate: "2024-03-15",
-      justification: "Required for advanced computing research and student projects",
-      status: "pending",
-      description: "Intel i9 processor, 32GB RAM, RTX 4090 GPU",
-      vendor: "Dell Technologies"
+      purpose: "Required for advanced computing research and student projects in AI and machine learning",
+      useful: "Will enable cutting-edge research, improve student learning outcomes, and enhance department capabilities",
+      status: "pending"
     },
     {
       id: "PR002",
@@ -166,13 +165,12 @@ const PrincipalDashboard = () => {
       assetType: "Digital",
       department: "Mechanical",
       hodName: "Dr. Brown",
-      estimatedCost: "₹2,00,000",
+      approxCosting: "₹2,00,000",
       priority: "Medium",
       requestDate: "2024-03-14",
-      justification: "Software licenses for 50 students in mechanical design course",
-      status: "pending",
-      description: "Annual subscription for 50 users",
-      vendor: "Autodesk"
+      purpose: "Software licenses for 50 students in mechanical design course",
+      useful: "Essential for teaching CAD/CAM courses and enabling students to work on real-world design projects",
+      status: "pending"
     }
   ]);
 
@@ -684,18 +682,17 @@ const PrincipalDashboard = () => {
                               {request.status}
                             </Badge>
                           </div>
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <p><strong>Request ID:</strong> {request.id}</p>
-                            <p><strong>Department:</strong> {request.department}</p>
-                            <p><strong>HOD:</strong> {request.hodName}</p>
-                            <p><strong>Request Date:</strong> {request.requestDate}</p>
-                            <p><strong>Estimated Cost:</strong> {request.estimatedCost}</p>
-                            <p><strong>Vendor:</strong> {request.vendor}</p>
-                          </div>
-                          <div className="space-y-2">
-                            <p><strong>Description:</strong> {request.description}</p>
-                            <p><strong>Justification:</strong> {request.justification}</p>
-                          </div>
+                           <div className="grid grid-cols-2 gap-4 text-sm">
+                             <p><strong>Request ID:</strong> {request.id}</p>
+                             <p><strong>Department:</strong> {request.department}</p>
+                             <p><strong>HOD:</strong> {request.hodName}</p>
+                             <p><strong>Request Date:</strong> {request.requestDate}</p>
+                             <p><strong>Approximate Cost:</strong> {request.approxCosting}</p>
+                           </div>
+                           <div className="space-y-2">
+                             <p><strong>Purpose:</strong> {request.purpose}</p>
+                             <p><strong>Usefulness:</strong> {request.useful}</p>
+                           </div>
                         </div>
                       </div>
                       {request.status === "pending" && (

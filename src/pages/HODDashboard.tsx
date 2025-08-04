@@ -20,14 +20,12 @@ const HODDashboard = () => {
   const [showPurchaseRequest, setShowPurchaseRequest] = useState(false);
   const [purchaseFormData, setPurchaseFormData] = useState({
     assetName: "",
-    assetType: "",
-    description: "",
-    estimatedCost: "",
-    justification: "",
+    assetType: "Physical",
+    purpose: "",
+    useful: "",
+    approxCosting: "",
     department: "Computer Science",
-    priority: "Medium",
-    vendor: "",
-    specifications: ""
+    priority: "Medium"
   });
 
   // Mock data for HOD assigned assets
@@ -199,7 +197,7 @@ const HODDashboard = () => {
   };
 
   const handlePurchaseRequest = () => {
-    if (!purchaseFormData.assetName || !purchaseFormData.assetType || !purchaseFormData.estimatedCost) {
+    if (!purchaseFormData.assetName || !purchaseFormData.purpose || !purchaseFormData.useful || !purchaseFormData.approxCosting) {
       toast.error("Please fill all required fields");
       return;
     }
@@ -208,14 +206,12 @@ const HODDashboard = () => {
     setShowPurchaseRequest(false);
     setPurchaseFormData({
       assetName: "",
-      assetType: "",
-      description: "",
-      estimatedCost: "",
-      justification: "",
+      assetType: "Physical",
+      purpose: "",
+      useful: "",
+      approxCosting: "",
       department: "Computer Science",
-      priority: "Medium",
-      vendor: "",
-      specifications: ""
+      priority: "Medium"
     });
   };
 
@@ -492,24 +488,34 @@ const HODDashboard = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Description</label>
+                <label className="block text-sm font-medium mb-2">Purpose *</label>
                 <Textarea
-                  value={purchaseFormData.description}
-                  onChange={(e) => setPurchaseFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Detailed description of the asset"
+                  value={purchaseFormData.purpose}
+                  onChange={(e) => setPurchaseFormData(prev => ({ ...prev, purpose: e.target.value }))}
+                  placeholder="What is the purpose of this asset?"
+                  rows={3}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Usefulness/Benefits *</label>
+                <Textarea
+                  value={purchaseFormData.useful}
+                  onChange={(e) => setPurchaseFormData(prev => ({ ...prev, useful: e.target.value }))}
+                  placeholder="How will this asset be useful? What benefits will it provide?"
                   rows={3}
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Estimated Cost *</label>
+                  <label className="block text-sm font-medium mb-2">Approximate Costing *</label>
                   <input
-                    type="number"
-                    value={purchaseFormData.estimatedCost}
-                    onChange={(e) => setPurchaseFormData(prev => ({ ...prev, estimatedCost: e.target.value }))}
+                    type="text"
+                    value={purchaseFormData.approxCosting}
+                    onChange={(e) => setPurchaseFormData(prev => ({ ...prev, approxCosting: e.target.value }))}
                     className="w-full px-3 py-2 border rounded-md"
-                    placeholder="₹ 0.00"
+                    placeholder="₹ 0 (approximate cost)"
                   />
                 </div>
                 <div>
@@ -529,50 +535,18 @@ const HODDashboard = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Justification</label>
-                <Textarea
-                  value={purchaseFormData.justification}
-                  onChange={(e) => setPurchaseFormData(prev => ({ ...prev, justification: e.target.value }))}
-                  placeholder="Why is this asset needed? How will it benefit the department?"
-                  rows={3}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Preferred Vendor</label>
-                  <input
-                    type="text"
-                    value={purchaseFormData.vendor}
-                    onChange={(e) => setPurchaseFormData(prev => ({ ...prev, vendor: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-md"
-                    placeholder="Vendor name (optional)"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Department</label>
-                  <Select value={purchaseFormData.department} onValueChange={(value) => setPurchaseFormData(prev => ({ ...prev, department: value }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Computer Science">Computer Science</SelectItem>
-                      <SelectItem value="Mechanical">Mechanical</SelectItem>
-                      <SelectItem value="Electrical">Electrical</SelectItem>
-                      <SelectItem value="Civil">Civil</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Technical Specifications</label>
-                <Textarea
-                  value={purchaseFormData.specifications}
-                  onChange={(e) => setPurchaseFormData(prev => ({ ...prev, specifications: e.target.value }))}
-                  placeholder="Technical specifications, requirements, or additional details"
-                  rows={3}
-                />
+                <label className="block text-sm font-medium mb-2">Department</label>
+                <Select value={purchaseFormData.department} onValueChange={(value) => setPurchaseFormData(prev => ({ ...prev, department: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Computer Science">Computer Science</SelectItem>
+                    <SelectItem value="Mechanical">Mechanical</SelectItem>
+                    <SelectItem value="Electrical">Electrical</SelectItem>
+                    <SelectItem value="Civil">Civil</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex gap-3">

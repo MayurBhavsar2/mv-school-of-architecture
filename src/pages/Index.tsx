@@ -24,15 +24,15 @@ const Index = () => {
       assetType: "Physical",
       department: "Computer Science",
       hodName: "Dr. Smith",
-      estimatedCost: "₹1,50,000",
+      approxCosting: "₹1,50,000",
       priority: "High",
       requestDate: "2024-03-15",
       approvedDate: "2024-03-16",
-      justification: "Required for advanced computing research and student projects",
+      purpose: "Required for advanced computing research and student projects",
+      useful: "Will enhance research capabilities and provide students with industry-standard computing power",
       status: "approved",
-      description: "Intel i9 processor, 32GB RAM, RTX 4090 GPU",
-      vendor: "Dell Technologies",
-      purchaseStatus: "pending"
+      purchaseStatus: "pending",
+      quotationStatus: "pending" // New field to track quotation collection
     },
     {
       id: "PR002",
@@ -40,17 +40,57 @@ const Index = () => {
       assetType: "Digital",
       department: "Mechanical",
       hodName: "Dr. Brown",
-      estimatedCost: "₹2,00,000",
+      approxCosting: "₹2,00,000",
       priority: "Medium",
       requestDate: "2024-03-14",
       approvedDate: "2024-03-15",
-      justification: "Software licenses for 50 students in mechanical design course",
+      purpose: "Software licenses for 50 students in mechanical design course",
+      useful: "Essential for teaching CAD/CAM courses and enabling students to work on real-world design projects",
       status: "approved",
-      description: "Annual subscription for 50 users",
-      vendor: "Autodesk",
-      purchaseStatus: "pending"
+      purchaseStatus: "pending",
+      quotationStatus: "collected" // Admin has collected quotations
     }
   ]);
+
+  // Mock quotations collected by admin
+  const [quotations, setQuotations] = useState([
+    {
+      requestId: "PR002",
+      quotations: [
+        { vendor: "Autodesk Direct", cost: "₹1,95,000", deliveryTime: "5 days", specifications: "50 user licenses, 1-year subscription" },
+        { vendor: "Software Solutions Inc", cost: "₹2,10,000", deliveryTime: "3 days", specifications: "50 user licenses, 1-year subscription + training" },
+        { vendor: "Tech Distributors", cost: "₹1,85,000", deliveryTime: "7 days", specifications: "50 user licenses, 1-year subscription" }
+      ]
+    }
+  ]);
+
+  const handleCollectQuotations = (id: string) => {
+    const updatedRequests = approvedPurchaseRequests.map(request => {
+      if (request.id === id) {
+        return { ...request, quotationStatus: "collected" };
+      }
+      return request;
+    });
+    
+    setApprovedPurchaseRequests(updatedRequests);
+    
+    const request = approvedPurchaseRequests.find(r => r.id === id);
+    toast.success(`Collecting quotations for ${request?.assetName}. Will send to Principal once ready.`);
+  };
+
+  const handleSendQuotationsToPrincipal = (id: string) => {
+    const updatedRequests = approvedPurchaseRequests.map(request => {
+      if (request.id === id) {
+        return { ...request, quotationStatus: "sent_to_principal" };
+      }
+      return request;
+    });
+    
+    setApprovedPurchaseRequests(updatedRequests);
+    
+    const request = approvedPurchaseRequests.find(r => r.id === id);
+    toast.success(`Quotations for ${request?.assetName} sent to Principal for final approval.`);
+  };
 
   const handlePurchaseAction = (id: string, action: "purchase" | "reject") => {
     const updatedRequests = approvedPurchaseRequests.map(request => {
@@ -155,11 +195,18 @@ const Index = () => {
                         <div>
                           <p><strong>Request Date:</strong> {request.requestDate}</p>
                           <p><strong>Approved Date:</strong> {request.approvedDate}</p>
-                          <p><strong>Estimated Cost:</strong> {request.estimatedCost}</p>
+                          <p><strong>Approximate Cost:</strong> {request.approxCosting}</p>
                         </div>
                         <div>
-                          <p><strong>Vendor:</strong> {request.vendor}</p>
-                          <p><strong>Status:</strong> 
+                          <p><strong>Quotation Status:</strong> 
+                            <span className={`ml-1 ${
+                              request.quotationStatus === "collected" ? "text-green-600" :
+                              request.quotationStatus === "sent_to_principal" ? "text-blue-600" : "text-orange-600"
+                            }`}>
+                              {request.quotationStatus?.replace("_", " ") || "pending"}
+                            </span>
+                          </p>
+                          <p><strong>Purchase Status:</strong> 
                             <span className={`ml-1 ${
                               request.purchaseStatus === "purchased" ? "text-green-600" :
                               request.purchaseStatus === "rejected" ? "text-red-600" : "text-blue-600"
@@ -170,21 +217,52 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <p><strong>Description:</strong> {request.description}</p>
-                        <p><strong>Justification:</strong> {request.justification}</p>
+                        <p><strong>Purpose:</strong> {request.purpose}</p>
+                        <p><strong>Usefulness:</strong> {request.useful}</p>
                       </div>
+
+                      {/* Show quotations if collected */}
+                      {request.quotationStatus === "collected" && quotations.find(q => q.requestId === request.id) && (
+                        <div className="mt-4 p-3 bg-gray-50 rounded border">
+                          <h4 className="font-medium mb-2">Collected Quotations:</h4>
+                          <div className="space-y-2">
+                            {quotations.find(q => q.requestId === request.id)?.quotations.map((quote, index) => (
+                              <div key={index} className="text-sm border-l-2 border-gray-300 pl-3">
+                                <p><strong>{quote.vendor}:</strong> {quote.cost} - {quote.deliveryTime}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                   {request.purchaseStatus === "pending" && (
                     <div className="flex gap-2 pt-4 border-t">
-                      <Button 
-                        size="sm" 
-                        onClick={() => handlePurchaseAction(request.id, "purchase")}
-                        className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
-                      >
-                        <CheckCircle className="h-4 w-4" />
-                        Proceed with Purchase
-                      </Button>
+                      {request.quotationStatus === "pending" && (
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleCollectQuotations(request.id)}
+                          className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+                        >
+                          <ShoppingCart className="h-4 w-4" />
+                          Collect 3 Quotations
+                        </Button>
+                      )}
+                      {request.quotationStatus === "collected" && (
+                        <Button 
+                          size="sm" 
+                          onClick={() => handleSendQuotationsToPrincipal(request.id)}
+                          className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
+                        >
+                          <CheckCircle className="h-4 w-4" />
+                          Send Quotations to Principal
+                        </Button>
+                      )}
+                      {request.quotationStatus === "sent_to_principal" && (
+                        <div className="text-sm text-muted-foreground italic">
+                          Waiting for Principal's approval on quotations...
+                        </div>
+                      )}
                       <Button 
                         size="sm" 
                         variant="destructive"
