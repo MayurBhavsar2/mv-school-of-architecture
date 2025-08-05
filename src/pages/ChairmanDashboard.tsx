@@ -25,6 +25,8 @@ const ChairmanDashboard = () => {
   const { toast } = useToast();
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedSection, setSelectedSection] = useState<string>("");
+  const [isSectionDialogOpen, setIsSectionDialogOpen] = useState(false);
 
   // Mock data for dashboard stats
   const stats = [
@@ -120,6 +122,58 @@ const ChairmanDashboard = () => {
     }
   ];
 
+  // Mock data for detailed sections
+  const totalAssets = [
+    { id: 1, name: "Dell Laptop", code: "DL-001", category: "IT Equipment", value: "₹45,000", status: "Active", location: "Computer Lab" },
+    { id: 2, name: "HP Projector", code: "HP-002", category: "AV Equipment", value: "₹25,000", status: "Active", location: "Lecture Hall 1" },
+    { id: 3, name: "Office Chair", code: "OC-003", category: "Furniture", value: "₹8,000", status: "Active", location: "Faculty Room" },
+    { id: 4, name: "Whiteboard", code: "WB-004", category: "Teaching Aid", value: "₹3,000", status: "Active", location: "Classroom A" },
+    { id: 5, name: "Air Conditioner", code: "AC-005", category: "HVAC", value: "₹35,000", status: "Active", location: "Conference Room" }
+  ];
+
+  const maintenanceDue = [
+    { id: 1, asset: "HP Projector", code: "HP-002", lastMaintenance: "2023-11-15", nextDue: "2024-02-15", type: "Scheduled", priority: "Medium" },
+    { id: 2, asset: "Air Conditioner", code: "AC-005", lastMaintenance: "2023-10-20", nextDue: "2024-01-20", type: "Urgent", priority: "High" },
+    { id: 3, asset: "Generator", code: "GN-006", lastMaintenance: "2023-12-01", nextDue: "2024-03-01", type: "Scheduled", priority: "Low" }
+  ];
+
+  const lowStocks = [
+    { id: 1, item: "Printer Cartridges", currentStock: 2, minStock: 10, category: "Consumables", supplier: "Office Supplies Co." },
+    { id: 2, item: "Whiteboard Markers", currentStock: 5, minStock: 20, category: "Stationery", supplier: "Stationery World" },
+    { id: 3, item: "A4 Paper", currentStock: 15, minStock: 50, category: "Paper", supplier: "Paper Plus" }
+  ];
+
+  const finalApprovedRequests = [
+    {
+      id: 1,
+      type: "Purchase Request",
+      description: "Desktop Computers for Lab",
+      requestedBy: "HOD Computer Science",
+      amount: "₹2,50,000",
+      approvedDate: "2024-01-12",
+      status: "Approved by Chairman"
+    },
+    {
+      id: 2,
+      type: "Hand-over Request",
+      description: "Transfer of Equipment to Mechanical Dept",
+      requestedBy: "Prof. Mehta",
+      items: "3 items",
+      approvedDate: "2024-01-10",
+      status: "Approved by Chairman"
+    },
+    {
+      id: 3,
+      type: "Quotation Approval",
+      description: "Laboratory Equipment Purchase",
+      requestedBy: "Admin",
+      amount: "₹3,75,000",
+      vendor: "SciTech Solutions",
+      approvedDate: "2024-01-08",
+      status: "Approved by Chairman"
+    }
+  ];
+
   // Mock notifications
   const notifications = [
     {
@@ -172,6 +226,115 @@ const ChairmanDashboard = () => {
   const openRequestDialog = (request: any) => {
     setSelectedRequest(request);
     setIsDialogOpen(true);
+  };
+
+  const openSectionDialog = (sectionName: string) => {
+    setSelectedSection(sectionName);
+    setIsSectionDialogOpen(true);
+  };
+
+  const getSectionData = (sectionName: string) => {
+    switch (sectionName) {
+      case "Total Assets":
+        return totalAssets;
+      case "Maintenance Due":
+        return maintenanceDue;
+      case "Low Stocks":
+        return lowStocks;
+      default:
+        return [];
+    }
+  };
+
+  const renderSectionTable = (sectionName: string) => {
+    const data = getSectionData(sectionName);
+    
+    if (sectionName === "Total Assets") {
+      return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Asset Name</TableHead>
+              <TableHead>Code</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Value</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Location</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((item: any) => (
+              <TableRow key={item.id}>
+                <TableCell className="font-medium">{item.name}</TableCell>
+                <TableCell>{item.code}</TableCell>
+                <TableCell>{item.category}</TableCell>
+                <TableCell>{item.value}</TableCell>
+                <TableCell><Badge variant="default">{item.status}</Badge></TableCell>
+                <TableCell>{item.location}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      );
+    } else if (sectionName === "Maintenance Due") {
+      return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Asset</TableHead>
+              <TableHead>Code</TableHead>
+              <TableHead>Last Maintenance</TableHead>
+              <TableHead>Next Due</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Priority</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((item: any) => (
+              <TableRow key={item.id}>
+                <TableCell className="font-medium">{item.asset}</TableCell>
+                <TableCell>{item.code}</TableCell>
+                <TableCell>{item.lastMaintenance}</TableCell>
+                <TableCell>{item.nextDue}</TableCell>
+                <TableCell>{item.type}</TableCell>
+                <TableCell>
+                  <Badge variant={item.priority === "High" ? "destructive" : item.priority === "Medium" ? "outline" : "secondary"}>
+                    {item.priority}
+                  </Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      );
+    } else if (sectionName === "Low Stocks") {
+      return (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Item</TableHead>
+              <TableHead>Current Stock</TableHead>
+              <TableHead>Minimum Stock</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Supplier</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((item: any) => (
+              <TableRow key={item.id}>
+                <TableCell className="font-medium">{item.item}</TableCell>
+                <TableCell>
+                  <Badge variant="destructive">{item.currentStock}</Badge>
+                </TableCell>
+                <TableCell>{item.minStock}</TableCell>
+                <TableCell>{item.category}</TableCell>
+                <TableCell>{item.supplier}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      );
+    }
   };
 
   return (
@@ -237,10 +400,10 @@ const ChairmanDashboard = () => {
                 key={index} 
                 className="cursor-pointer hover:shadow-md transition-shadow"
                 onClick={() => {
-                  if (stat.route.startsWith('#')) {
-                    document.getElementById(stat.route.substring(1))?.scrollIntoView({ behavior: 'smooth' });
+                  if (stat.title === "Pending Approvals") {
+                    document.getElementById("pending-approvals")?.scrollIntoView({ behavior: 'smooth' });
                   } else {
-                    window.location.href = stat.route;
+                    openSectionDialog(stat.title);
                   }
                 }}
               >
@@ -298,6 +461,45 @@ const ChairmanDashboard = () => {
                         Review
                       </Button>
                     </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Final Approved Requests */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5" />
+              Final Approved Requests
+            </CardTitle>
+            <CardDescription>
+              Requests that have been approved by the Chairman
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {finalApprovedRequests.map((request) => (
+                <div key={request.id} className="border rounded-lg p-4 bg-green-50 dark:bg-green-950/20">
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-medium">{request.type}</h3>
+                        <Badge variant="default" className="bg-green-600">
+                          {request.status}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{request.description}</p>
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                        <span>Requested by: {request.requestedBy}</span>
+                        <span>Approved on: {request.approvedDate}</span>
+                        {request.amount && <span>Amount: {request.amount}</span>}
+                        {request.vendor && <span>Vendor: {request.vendor}</span>}
+                      </div>
+                    </div>
+                    <CheckCircle className="h-6 w-6 text-green-600" />
                   </div>
                 </div>
               ))}
@@ -457,6 +659,21 @@ const ChairmanDashboard = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Section Details Dialog */}
+      <Dialog open={isSectionDialogOpen} onOpenChange={setIsSectionDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{selectedSection}</DialogTitle>
+            <DialogDescription>
+              Detailed view of {selectedSection.toLowerCase()} data
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {renderSectionTable(selectedSection)}
+          </div>
         </DialogContent>
       </Dialog>
     </div>
