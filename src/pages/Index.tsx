@@ -11,7 +11,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShoppingCart, CheckCircle, XCircle, Upload } from "lucide-react";
+import { ShoppingCart, CheckCircle, XCircle, Upload, Plus } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
 const Index = () => {
@@ -20,35 +21,56 @@ const Index = () => {
   const [showQuotationCollection, setShowQuotationCollection] = useState(false);
   const [selectedRequestForQuotation, setSelectedRequestForQuotation] = useState<string | null>(null);
   const [vendors, setVendors] = useState([
-    { name: "", file: null },
-    { name: "", file: null },
-    { name: "", file: null }
+    { name: "", email: "", contact: "", file: null },
+    { name: "", email: "", contact: "", file: null },
+    { name: "", email: "", contact: "", file: null }
   ]);
+  const [showNewPurchaseRequest, setShowNewPurchaseRequest] = useState(false);
+  const [newPurchaseRequest, setNewPurchaseRequest] = useState({
+    assetName: "",
+    assetType: "Physical",
+    department: "",
+    approxCosting: "",
+    priority: "Medium",
+    purpose: "",
+    useful: ""
+  });
   
-  // Mock approved purchase requests data
-  const [approvedPurchaseRequests, setApprovedPurchaseRequests] = useState([
+  // Mock purchase requests raised by admin
+  const [purchaseRequests, setPurchaseRequests] = useState([
     {
       id: "PR001",
       assetName: "High-End Workstation",
       assetType: "Physical",
       department: "Computer Science",
-      hodName: "Dr. Smith",
       approxCosting: "₹1,50,000",
       priority: "High",
       requestDate: "2024-03-15",
-      approvedDate: "2024-03-16",
       purpose: "Required for advanced computing research and student projects",
       useful: "Will enhance research capabilities and provide students with industry-standard computing power",
-      status: "approved",
-      purchaseStatus: "pending",
-      quotationStatus: "pending" // New field to track quotation collection
+      status: "pending" // pending, approved, rejected
     },
     {
       id: "PR002",
       assetName: "AutoCAD Licenses",
       assetType: "Digital",
       department: "Mechanical",
-      hodName: "Dr. Brown",
+      approxCosting: "₹2,00,000",
+      priority: "Medium",
+      requestDate: "2024-03-14",
+      purpose: "Software licenses for 50 students in mechanical design course",
+      useful: "Essential for teaching CAD/CAM courses and enabling students to work on real-world design projects",
+      status: "approved"
+    }
+  ]);
+
+  // Mock approved purchase requests data (approved by Principal)
+  const [approvedPurchaseRequests, setApprovedPurchaseRequests] = useState([
+    {
+      id: "PR002",
+      assetName: "AutoCAD Licenses",
+      assetType: "Digital",
+      department: "Mechanical",
       approxCosting: "₹2,00,000",
       priority: "Medium",
       requestDate: "2024-03-14",
@@ -57,7 +79,7 @@ const Index = () => {
       useful: "Essential for teaching CAD/CAM courses and enabling students to work on real-world design projects",
       status: "approved",
       purchaseStatus: "pending",
-      quotationStatus: "collected" // Admin has collected quotations
+      quotationStatus: "pending" // New field to track quotation collection
     }
   ]);
 
@@ -77,15 +99,15 @@ const Index = () => {
     setSelectedRequestForQuotation(id);
     setShowQuotationCollection(true);
     setVendors([
-      { name: "", file: null },
-      { name: "", file: null },
-      { name: "", file: null }
+      { name: "", email: "", contact: "", file: null },
+      { name: "", email: "", contact: "", file: null },
+      { name: "", email: "", contact: "", file: null }
     ]);
   };
 
-  const handleVendorNameChange = (index: number, name: string) => {
+  const handleVendorChange = (index: number, field: string, value: string) => {
     setVendors(prev => prev.map((vendor, i) => 
-      i === index ? { ...vendor, name } : vendor
+      i === index ? { ...vendor, [field]: value } : vendor
     ));
   };
 
@@ -98,9 +120,9 @@ const Index = () => {
   const handleSubmitQuotations = () => {
     if (!selectedRequestForQuotation) return;
     
-    const incompleteVendors = vendors.filter(v => !v.name.trim() || !v.file);
+    const incompleteVendors = vendors.filter(v => !v.name.trim() || !v.email.trim() || !v.contact.trim() || !v.file);
     if (incompleteVendors.length > 0) {
-      toast.error("Please provide vendor names and upload files for all 3 vendors");
+      toast.error("Please provide vendor names, email, contact number and upload files for all 3 vendors");
       return;
     }
 
@@ -118,6 +140,8 @@ const Index = () => {
       requestId: selectedRequestForQuotation,
       quotations: vendors.map((vendor, index) => ({
         vendor: vendor.name,
+        email: vendor.email,
+        contact: vendor.contact,
         cost: `₹${(150000 + Math.random() * 100000).toFixed(0)}`,
         deliveryTime: `${5 + Math.floor(Math.random() * 10)} days`,
         specifications: "As per requirements",
@@ -134,10 +158,10 @@ const Index = () => {
     setSelectedRequestForQuotation(null);
   };
 
-  const handleSendQuotationsToPrincipal = (id: string) => {
+  const handleSendQuotationsToChairman = (id: string) => {
     const updatedRequests = approvedPurchaseRequests.map(request => {
       if (request.id === id) {
-        return { ...request, quotationStatus: "sent_to_principal" };
+        return { ...request, quotationStatus: "sent_to_chairman" };
       }
       return request;
     });
@@ -145,7 +169,34 @@ const Index = () => {
     setApprovedPurchaseRequests(updatedRequests);
     
     const request = approvedPurchaseRequests.find(r => r.id === id);
-    toast.success(`Quotations for ${request?.assetName} sent to Principal for final approval.`);
+    toast.success(`Quotations for ${request?.assetName} sent to Chairman for final approval.`);
+  };
+
+  const handleCreatePurchaseRequest = () => {
+    if (!newPurchaseRequest.assetName || !newPurchaseRequest.department || !newPurchaseRequest.approxCosting || !newPurchaseRequest.purpose || !newPurchaseRequest.useful) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+
+    const request = {
+      id: `PR${(purchaseRequests.length + 1).toString().padStart(3, '0')}`,
+      ...newPurchaseRequest,
+      requestDate: new Date().toISOString().split('T')[0],
+      status: "pending"
+    };
+
+    setPurchaseRequests(prev => [request, ...prev]);
+    setNewPurchaseRequest({
+      assetName: "",
+      assetType: "Physical",
+      department: "",
+      approxCosting: "",
+      priority: "Medium",
+      purpose: "",
+      useful: ""
+    });
+    setShowNewPurchaseRequest(false);
+    toast.success("Purchase request created and sent to Principal for approval");
   };
 
   const handlePurchaseAction = (id: string, action: "purchase" | "reject") => {
@@ -172,31 +223,60 @@ const Index = () => {
         <div className="space-y-8">
           <DashboardStats />
           
-          {/* Purchase Requests Card */}
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowPurchaseRequests(true)}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5" />
-                Purchase Requests from Principal
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold">
-                    {approvedPurchaseRequests.filter(r => r.purchaseStatus === "pending").length}
+          {/* Purchase Requests Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* New Purchase Request Card */}
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowNewPurchaseRequest(true)}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  Create Purchase Request
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-2xl font-bold">
+                      {purchaseRequests.filter(r => r.status === "pending").length}
+                    </div>
+                    <p className="text-sm text-muted-foreground">Pending approval from Principal</p>
                   </div>
-                  <p className="text-sm text-muted-foreground">Approved requests awaiting purchase</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-semibold text-green-600">
-                    {approvedPurchaseRequests.filter(r => r.purchaseStatus === "purchased").length}
+                  <div className="text-right">
+                    <div className="text-lg font-semibold text-green-600">
+                      {purchaseRequests.filter(r => r.status === "approved").length}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Approved</p>
                   </div>
-                  <p className="text-xs text-muted-foreground">Completed</p>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Approved Purchase Requests Card */}
+            <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowPurchaseRequests(true)}>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  Approved Purchase Requests
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-2xl font-bold">
+                      {approvedPurchaseRequests.filter(r => r.purchaseStatus === "pending").length}
+                    </div>
+                    <p className="text-sm text-muted-foreground">Awaiting quotation collection</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-lg font-semibold text-green-600">
+                      {approvedPurchaseRequests.filter(r => r.purchaseStatus === "purchased").length}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Completed</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
           
           <AssetChart />
           <RecentAssets />
@@ -206,6 +286,106 @@ const Index = () => {
       {showAssetForm && (
         <AssetTypeSelector onClose={() => setShowAssetForm(false)} />
       )}
+
+      {/* New Purchase Request Dialog */}
+      <Dialog open={showNewPurchaseRequest} onOpenChange={setShowNewPurchaseRequest}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5" />
+              Create New Purchase Request
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="assetName">Asset Name *</Label>
+                <Input
+                  id="assetName"
+                  placeholder="Enter asset name"
+                  value={newPurchaseRequest.assetName}
+                  onChange={(e) => setNewPurchaseRequest(prev => ({ ...prev, assetName: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="assetType">Asset Type</Label>
+                <Select value={newPurchaseRequest.assetType} onValueChange={(value) => setNewPurchaseRequest(prev => ({ ...prev, assetType: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Physical">Physical</SelectItem>
+                    <SelectItem value="Digital">Digital</SelectItem>
+                    <SelectItem value="Consumable">Consumable</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="department">Department *</Label>
+                <Input
+                  id="department"
+                  placeholder="Enter department"
+                  value={newPurchaseRequest.department}
+                  onChange={(e) => setNewPurchaseRequest(prev => ({ ...prev, department: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="approxCosting">Approximate Cost *</Label>
+                <Input
+                  id="approxCosting"
+                  placeholder="₹50,000"
+                  value={newPurchaseRequest.approxCosting}
+                  onChange={(e) => setNewPurchaseRequest(prev => ({ ...prev, approxCosting: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label htmlFor="priority">Priority</Label>
+                <Select value={newPurchaseRequest.priority} onValueChange={(value) => setNewPurchaseRequest(prev => ({ ...prev, priority: value }))}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Low">Low</SelectItem>
+                    <SelectItem value="Medium">Medium</SelectItem>
+                    <SelectItem value="High">High</SelectItem>
+                    <SelectItem value="Urgent">Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="purpose">Purpose *</Label>
+              <textarea
+                id="purpose"
+                className="w-full p-2 border rounded-md"
+                rows={3}
+                placeholder="Describe the purpose of this asset"
+                value={newPurchaseRequest.purpose}
+                onChange={(e) => setNewPurchaseRequest(prev => ({ ...prev, purpose: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="useful">Usefulness *</Label>
+              <textarea
+                id="useful"
+                className="w-full p-2 border rounded-md"
+                rows={3}
+                placeholder="Explain how this asset will be useful"
+                value={newPurchaseRequest.useful}
+                onChange={(e) => setNewPurchaseRequest(prev => ({ ...prev, useful: e.target.value }))}
+              />
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button onClick={handleCreatePurchaseRequest} className="bg-green-600 hover:bg-green-700">
+                Submit Request
+              </Button>
+              <Button variant="outline" onClick={() => setShowNewPurchaseRequest(false)}>
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Purchase Requests Dialog */}
       <Dialog open={showPurchaseRequests} onOpenChange={setShowPurchaseRequests}>
@@ -245,8 +425,8 @@ const Index = () => {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div>
                           <p><strong>Request ID:</strong> {request.id}</p>
-                          <p><strong>Department:</strong> {request.department}</p>
-                          <p><strong>Requested by:</strong> {request.hodName}</p>
+                        <p><strong>Department:</strong> {request.department}</p>
+                        <p><strong>Requested by:</strong> Admin</p>
                         </div>
                         <div>
                           <p><strong>Request Date:</strong> {request.requestDate}</p>
@@ -307,16 +487,16 @@ const Index = () => {
                       {request.quotationStatus === "collected" && (
                         <Button 
                           size="sm" 
-                          onClick={() => handleSendQuotationsToPrincipal(request.id)}
+                          onClick={() => handleSendQuotationsToChairman(request.id)}
                           className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
                         >
                           <CheckCircle className="h-4 w-4" />
-                          Send Quotations to Principal
+                          Send Quotations to Chairman
                         </Button>
                       )}
-                      {request.quotationStatus === "sent_to_principal" && (
+                      {request.quotationStatus === "sent_to_chairman" && (
                         <div className="text-sm text-muted-foreground italic">
-                          Waiting for Principal's approval on quotations...
+                          Waiting for Chairman's approval on quotations...
                         </div>
                       )}
                       <Button 
@@ -357,7 +537,27 @@ const Index = () => {
                       id={`vendor-name-${index}`}
                       placeholder="Enter vendor name"
                       value={vendor.name}
-                      onChange={(e) => handleVendorNameChange(index, e.target.value)}
+                      onChange={(e) => handleVendorChange(index, "name", e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`vendor-email-${index}`}>Vendor Email</Label>
+                    <Input
+                      id={`vendor-email-${index}`}
+                      type="email"
+                      placeholder="vendor@company.com"
+                      value={vendor.email}
+                      onChange={(e) => handleVendorChange(index, "email", e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor={`vendor-contact-${index}`}>Contact Number</Label>
+                    <Input
+                      id={`vendor-contact-${index}`}
+                      type="tel"
+                      placeholder="+91 98765 43210"
+                      value={vendor.contact}
+                      onChange={(e) => handleVendorChange(index, "contact", e.target.value)}
                     />
                   </div>
                   <div>
