@@ -36,7 +36,7 @@ const Index = () => {
     useful: ""
   });
   
-  // Mock purchase requests raised by admin
+  // Mock purchase requests raised by faculty
   const [purchaseRequests, setPurchaseRequests] = useState([
     {
       id: "PR001",
@@ -83,7 +83,7 @@ const Index = () => {
     }
   ]);
 
-  // Mock quotations collected by admin
+  // Mock quotations collected by faculty
   const [quotations, setQuotations] = useState([
     {
       requestId: "PR002",
@@ -158,10 +158,10 @@ const Index = () => {
     setSelectedRequestForQuotation(null);
   };
 
-  const handleSendQuotationsToChairman = (id: string) => {
+  const handleSendQuotationsToACC = (id: string) => {
     const updatedRequests = approvedPurchaseRequests.map(request => {
       if (request.id === id) {
-        return { ...request, quotationStatus: "sent_to_chairman" };
+        return { ...request, quotationStatus: "sent_to_acc" };
       }
       return request;
     });
@@ -169,7 +169,7 @@ const Index = () => {
     setApprovedPurchaseRequests(updatedRequests);
     
     const request = approvedPurchaseRequests.find(r => r.id === id);
-    toast.success(`Quotations for ${request?.assetName} sent to Chairman for final approval.`);
+    toast.success(`Quotations for ${request?.assetName} sent to ACC for final approval.`);
   };
 
   const handleCreatePurchaseRequest = () => {
@@ -426,7 +426,7 @@ const Index = () => {
                         <div>
                           <p><strong>Request ID:</strong> {request.id}</p>
                         <p><strong>Department:</strong> {request.department}</p>
-                        <p><strong>Requested by:</strong> Admin</p>
+                        <p><strong>Requested by:</strong> Faculty</p>
                         </div>
                         <div>
                           <p><strong>Request Date:</strong> {request.requestDate}</p>
@@ -487,16 +487,16 @@ const Index = () => {
                       {request.quotationStatus === "collected" && (
                         <Button 
                           size="sm" 
-                          onClick={() => handleSendQuotationsToChairman(request.id)}
+                          onClick={() => handleSendQuotationsToACC(request.id)}
                           className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2"
                         >
                           <CheckCircle className="h-4 w-4" />
-                          Send Quotations to Chairman
+                          Send Quotations to ACC
                         </Button>
                       )}
-                      {request.quotationStatus === "sent_to_chairman" && (
+                      {request.quotationStatus === "sent_to_acc" && (
                         <div className="text-sm text-muted-foreground italic">
-                          Waiting for Chairman's approval on quotations...
+                          Waiting for ACC's approval on quotations...
                         </div>
                       )}
                       <Button 

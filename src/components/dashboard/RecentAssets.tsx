@@ -34,7 +34,7 @@ export const RecentAssets = () => {
       name: "Printer Cartridges",
       type: "Consumable",
       location: "Storage Room",
-      faculty: "Admin Team",
+      faculty: "Faculty Team",
       status: "In Stock",
       addedDate: "2024-01-13"
     },

@@ -15,7 +15,7 @@ const PrincipalAssetsPage = () => {
   const [assetFilter, setAssetFilter] = useState("all");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Same mock data as admin but without edit capabilities
+  // Same mock data as faculty but without edit capabilities
   const allAssets = [
     { 
       id: "AST001", name: "Microsoft Office 365", type: "Digital", licenseKey: "ABC123-DEF456", 
@@ -33,14 +33,14 @@ const PrincipalAssetsPage = () => {
     },
     { 
       id: "AST003", name: "AutoCAD License", type: "Digital", licenseKey: "XYZ789-QWE012", 
-      faculty: "IT Admin", hod: "Dr. IT Head", status: "Active",
+      faculty: "IT Faculty", hod: "Dr. IT Head", status: "Active",
       activationDate: "2023-06-01", expiryDate: "2024-06-01", quantity: 25,
       vendor: "Autodesk", vendorContact: "+1-415-507-5000", vendorEmail: "support@autodesk.com",
       picture: "autocad_license.jpg", invoice: "INV003.pdf"
     },
     { 
       id: "AST004", name: "Printer Paper", type: "Consumable", supplier: "Office Supplies Co.", 
-      faculty: "Admin", hod: "Admin Head", status: "Low Stock", unitType: "Box",
+      faculty: "Faculty", hod: "Faculty Head", status: "Low Stock", unitType: "Box",
       quantity: 5, returnQuantity: 0, alertThreshold: 10, expiryDate: "2025-12-31",
       vendor: "Office Supplies Co.", vendorContact: "+91-9988776655", vendorEmail: "sales@officesupplies.com",
       picture: "printer_paper.jpg", invoice: "INV004.pdf"

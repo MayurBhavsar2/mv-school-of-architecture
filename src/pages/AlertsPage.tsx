@@ -36,7 +36,7 @@ const AlertsPage = () => {
       message: "Printer Paper stock below threshold (5 remaining)",
       threshold: "5",
       priority: "medium",
-      faculty: "Admin"
+      faculty: "Faculty"
     },
     {
       id: "ALT004",
@@ -45,7 +45,7 @@ const AlertsPage = () => {
       assetId: "AST009",
       message: "Toner Cartridge is out of stock",
       priority: "high",
-      faculty: "Admin"
+      faculty: "Faculty"
     }
   ];
 

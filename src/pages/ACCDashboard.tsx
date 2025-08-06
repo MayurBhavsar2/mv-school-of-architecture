@@ -22,7 +22,7 @@ import {
   ShoppingCart
 } from "lucide-react";
 
-const ChairmanDashboard = () => {
+const ACCDashboard = () => {
   const { toast } = useToast();
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -39,11 +39,11 @@ const ChairmanDashboard = () => {
       approvedBy: "Principal",
       items: "5 items",
       date: "2024-01-14",
-      status: "Waiting for Chairman Approval"
+      status: "Waiting for ACC Approval"
     }
   ];
 
-  // Mock data for quotation approvals from admin
+  // Mock data for quotation approvals from faculty
   const [quotationApprovals, setQuotationApprovals] = useState([
     {
       id: "PR002",
@@ -51,14 +51,14 @@ const ChairmanDashboard = () => {
       assetType: "Digital",
       department: "Mechanical",
       approxCosting: "₹2,00,000",
-      requestedBy: "Admin",
+      requestedBy: "Faculty",
       quotations: [
         { vendor: "Autodesk Direct", email: "sales@autodesk.com", contact: "+91 98765 43210", cost: "₹1,95,000", deliveryTime: "5 days", specifications: "50 user licenses, 1-year subscription" },
         { vendor: "Software Solutions Inc", email: "info@softwaresolutions.com", contact: "+91 98765 43211", cost: "₹2,10,000", deliveryTime: "3 days", specifications: "50 user licenses, 1-year subscription + training" },
         { vendor: "Tech Distributors", email: "contact@techdist.com", contact: "+91 98765 43212", cost: "₹1,85,000", deliveryTime: "7 days", specifications: "50 user licenses, 1-year subscription" }
       ],
       date: "2024-01-15",
-      status: "pending_chairman_approval"
+      status: "pending_acc_approval"
     }
   ]);
 
@@ -90,7 +90,7 @@ const ChairmanDashboard = () => {
     },
     {
       title: "Pending Approvals",
-      value: (pendingApprovals.length + quotationApprovals.filter(q => q.status === "pending_chairman_approval").length).toString(),
+      value: (pendingApprovals.length + quotationApprovals.filter(q => q.status === "pending_acc_approval").length).toString(),
       change: "+8%",
       icon: Clock,
       color: "text-purple-600",
@@ -149,7 +149,7 @@ const ChairmanDashboard = () => {
       requestedBy: "HOD Computer Science",
       amount: "₹2,50,000",
       approvedDate: "2024-01-12",
-      status: "Approved by Chairman"
+      status: "Approved by ACC"
     },
     {
       id: 2,
@@ -158,17 +158,17 @@ const ChairmanDashboard = () => {
       requestedBy: "Prof. Mehta",
       items: "3 items",
       approvedDate: "2024-01-10",
-      status: "Approved by Chairman"
+      status: "Approved by ACC"
     },
     {
       id: 3,
       type: "Quotation Approval",
       description: "Laboratory Equipment Purchase",
-      requestedBy: "Admin",
+      requestedBy: "Faculty",
       amount: "₹3,75,000",
       vendor: "SciTech Solutions",
       approvedDate: "2024-01-08",
-      status: "Approved by Chairman"
+      status: "Approved by ACC"
     }
   ];
 
@@ -229,14 +229,14 @@ const ChairmanDashboard = () => {
     
     // Update the quotation approval status
     const updatedQuotations = quotationApprovals.map(q => 
-      q.id === requestId ? { ...q, status: "approved_by_chairman", selectedVendor } : q
+      q.id === requestId ? { ...q, status: "approved_by_acc", selectedVendor } : q
     );
     
     setQuotationApprovals(updatedQuotations);
 
     toast({
       title: "Vendor Approved",
-      description: `${selectedVendor.vendor} approved for ${request.assetName}. Purchase order sent back to Admin.`,
+      description: `${selectedVendor.vendor} approved for ${request.assetName}. Purchase order sent back to Faculty.`,
     });
   };
 
@@ -361,7 +361,7 @@ const ChairmanDashboard = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Chairman Dashboard</h1>
+              <h1 className="text-2xl font-bold text-foreground">ACC Dashboard</h1>
               <p className="text-muted-foreground">MV School of Architecture - Executive Overview</p>
             </div>
             <div className="flex items-center gap-4">
@@ -440,7 +440,7 @@ const ChairmanDashboard = () => {
         </div>
 
         {/* Quotation Approvals Section */}
-        {quotationApprovals.filter(q => q.status === "pending_chairman_approval").length > 0 && (
+        {quotationApprovals.filter(q => q.status === "pending_acc_approval").length > 0 && (
           <Card className="mb-8">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -448,19 +448,19 @@ const ChairmanDashboard = () => {
                 Quotation Approvals from Admin
               </CardTitle>
               <CardDescription>
-                Quotations collected by Admin awaiting your final approval
+                Quotations collected by Faculty awaiting your final approval
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {quotationApprovals.filter(q => q.status === "pending_chairman_approval").map((request) => (
+                {quotationApprovals.filter(q => q.status === "pending_acc_approval").map((request) => (
                   <div key={request.id} className="border rounded-lg p-6 space-y-4">
                     <div className="flex items-start justify-between">
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-lg">{request.assetName}</h3>
                           <Badge variant="outline">{request.assetType}</Badge>
-                          <Badge variant="secondary">Pending Chairman Approval</Badge>
+                          <Badge variant="secondary">Pending ACC Approval</Badge>
                         </div>
                         <div className="text-sm text-muted-foreground">
                           <p><strong>Request ID:</strong> {request.id}</p>
@@ -769,4 +769,4 @@ const ChairmanDashboard = () => {
   );
 };
 
-export default ChairmanDashboard;
+export default ACCDashboard;

@@ -35,13 +35,13 @@ const AssetsPage = () => {
       },
       { 
         id: "AST003", name: "AutoCAD License", type: "Digital", licenseKey: "XYZ789-QWE012", 
-        faculty: "IT Admin", hod: "Dr. IT Head", status: "Active",
+        faculty: "IT Faculty", hod: "Dr. IT Head", status: "Active",
         activationDate: "2023-06-01", expiryDate: "2024-06-01", quantity: 25,
         vendor: "Autodesk", vendorContact: "+1-415-507-5000", vendorEmail: "support@autodesk.com"
       },
       { 
         id: "AST004", name: "Printer Paper", type: "Consumable", supplier: "Office Supplies Co.", 
-        faculty: "Admin", hod: "Admin Head", status: "Low Stock", unitType: "Box",
+        faculty: "Faculty", hod: "Faculty Head", status: "Low Stock", unitType: "Box",
         quantity: 5, returnQuantity: 0, alertThreshold: 10, expiryDate: "2025-12-31",
         vendor: "Office Supplies Co.", vendorContact: "+91-9988776655", vendorEmail: "sales@officesupplies.com"
       },
@@ -75,7 +75,7 @@ const AssetsPage = () => {
       },
       { 
         id: "AST003", name: "AutoCAD License", type: "Digital", licenseKey: "XYZ789-QWE012", 
-        faculty: "IT Admin", hod: "Dr. IT Head", status: "Active",
+        faculty: "IT Faculty", hod: "Dr. IT Head", status: "Active",
         activationDate: "2023-06-01", expiryDate: "2024-06-01", quantity: 25,
         vendor: "Autodesk", vendorContact: "+1-415-507-5000", vendorEmail: "support@autodesk.com"
       },
@@ -89,19 +89,19 @@ const AssetsPage = () => {
     consumables: [
       { 
         id: "AST004", name: "Printer Paper", type: "Consumable", supplier: "Office Supplies Co.", 
-        faculty: "Admin", hod: "Admin Head", status: "Low Stock", unitType: "Box",
+        faculty: "Faculty", hod: "Faculty Head", status: "Low Stock", unitType: "Box",
         quantity: 5, returnQuantity: 0, alertThreshold: 10, expiryDate: "2025-12-31",
         vendor: "Office Supplies Co.", vendorContact: "+91-9988776655", vendorEmail: "sales@officesupplies.com"
       },
       { 
         id: "AST008", name: "Markers", type: "Consumable", supplier: "Stationery Plus", 
-        faculty: "Admin", hod: "Admin Head", status: "In Stock", unitType: "Pack",
+        faculty: "Faculty", hod: "Faculty Head", status: "In Stock", unitType: "Pack",
         quantity: 25, returnQuantity: 2, alertThreshold: 5, expiryDate: "2025-06-30",
         vendor: "Stationery Plus", vendorContact: "+91-9988776656", vendorEmail: "sales@stationeryplus.com"
       },
       { 
         id: "AST009", name: "Toner Cartridge", type: "Consumable", supplier: "Print Solutions", 
-        faculty: "Admin", hod: "Admin Head", status: "Out of Stock", unitType: "Piece",
+        faculty: "Faculty", hod: "Faculty Head", status: "Out of Stock", unitType: "Piece",
         quantity: 0, returnQuantity: 0, alertThreshold: 3, expiryDate: "2025-12-31",
         vendor: "Print Solutions", vendorContact: "+91-9988776657", vendorEmail: "sales@printsolutions.com"
       },

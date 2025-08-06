@@ -32,7 +32,7 @@ const PrincipalDashboard = () => {
     {
       id: 1,
       type: "new_asset",
-      message: "New Projector (AST011) registered by Admin",
+      message: "New Projector (AST011) registered by Faculty",
       timestamp: "2024-01-30 10:30 AM",
       status: "unread"
     },
@@ -321,7 +321,7 @@ const PrincipalDashboard = () => {
     if (action === "approve") {
       toast({
         title: "Purchase Request Approved",
-        description: `${request?.assetName} has been approved and sent to Admin for purchase.`
+        description: `${request?.assetName} has been approved and sent to Faculty for purchase.`
       });
     } else {
       toast({
@@ -346,7 +346,7 @@ const PrincipalDashboard = () => {
 
     toast({
       title: "Vendor Selected",
-      description: `${selectedVendor.vendor} selected for ${request.assetName}. Purchase approved and sent back to Admin.`
+      description: `${selectedVendor.vendor} selected for ${request.assetName}. Purchase approved and sent back to Faculty.`
     });
   };
 
@@ -768,7 +768,7 @@ const PrincipalDashboard = () => {
                             onClick={() => handlePurchaseApproval(request.id, "approve")}
                             className="bg-green-600 hover:bg-green-700"
                           >
-                            Approve & Send to Admin
+                            Approve & Send to Faculty
                           </Button>
                           <Button 
                             size="sm" 
