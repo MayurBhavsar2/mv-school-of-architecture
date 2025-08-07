@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Bell, Package, CheckCircle, Clock, FileText, AlertTriangle, User, Wrench, Plus, ShoppingCart } from "lucide-react";
+import { Bell, Package, CheckCircle, Clock, FileText, AlertTriangle, User, Wrench, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 const HODDashboard = () => {
@@ -17,16 +17,6 @@ const HODDashboard = () => {
   const [auditStatus, setAuditStatus] = useState("pending");
   const [auditComments, setAuditComments] = useState("");
   const [showNotifications, setShowNotifications] = useState(false);
-  const [showPurchaseRequest, setShowPurchaseRequest] = useState(false);
-  const [purchaseFormData, setPurchaseFormData] = useState({
-    assetName: "",
-    assetType: "Physical",
-    purpose: "",
-    useful: "",
-    approxCosting: "",
-    department: "Computer Science",
-    priority: "Medium"
-  });
 
   // Mock data for HOD assigned assets
   const assignedAssets = [
@@ -137,6 +127,15 @@ const HODDashboard = () => {
       icon: AlertTriangle,
       timestamp: "1 week ago",
       isRead: true
+    },
+    {
+      id: "NOT005",
+      type: "Purchase Request",
+      title: "Purchase Request Notification",
+      message: "You have received a notification regarding purchase request PR001 for High-End Workstation.",
+      icon: FileText,
+      timestamp: "5 hours ago",
+      isRead: false
     }
   ];
 
@@ -196,24 +195,6 @@ const HODDashboard = () => {
     }
   };
 
-  const handlePurchaseRequest = () => {
-    if (!purchaseFormData.assetName || !purchaseFormData.purpose || !purchaseFormData.useful || !purchaseFormData.approxCosting) {
-      toast.error("Please fill all required fields");
-      return;
-    }
-
-    toast.success(`Purchase request submitted for ${purchaseFormData.assetName}. Principal will be notified for approval.`);
-    setShowPurchaseRequest(false);
-    setPurchaseFormData({
-      assetName: "",
-      assetType: "Physical",
-      purpose: "",
-      useful: "",
-      approxCosting: "",
-      department: "Computer Science",
-      priority: "Medium"
-    });
-  };
 
   const pendingAudits = auditAssignments.filter(audit => audit.status === "Pending").length;
   const inProgressAudits = auditAssignments.filter(audit => audit.status === "In Progress").length;
@@ -230,14 +211,6 @@ const HODDashboard = () => {
               <p className="text-muted-foreground">Computer Science Department</p>
             </div>
             <div className="flex items-center gap-4">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowPurchaseRequest(true)}
-              >
-                <ShoppingCart className="h-4 w-4 mr-2" />
-                Purchase Request
-              </Button>
               <Button 
                 variant="outline" 
                 size="sm"
@@ -447,120 +420,6 @@ const HODDashboard = () => {
           </DialogContent>
         </Dialog>
 
-        {/* Purchase Request Dialog */}
-        <Dialog open={showPurchaseRequest} onOpenChange={setShowPurchaseRequest}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <ShoppingCart className="h-5 w-5" />
-                Asset Purchase Request
-              </DialogTitle>
-              <DialogDescription>
-                Submit a request to purchase new assets for your department
-              </DialogDescription>
-            </DialogHeader>
-            
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Asset Name *</label>
-                  <input
-                    type="text"
-                    value={purchaseFormData.assetName}
-                    onChange={(e) => setPurchaseFormData(prev => ({ ...prev, assetName: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-md"
-                    placeholder="Enter asset name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Asset Type *</label>
-                  <Select value={purchaseFormData.assetType} onValueChange={(value) => setPurchaseFormData(prev => ({ ...prev, assetType: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select asset type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Physical">Physical</SelectItem>
-                      <SelectItem value="Digital">Digital</SelectItem>
-                      <SelectItem value="Consumable">Consumable</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Purpose *</label>
-                <Textarea
-                  value={purchaseFormData.purpose}
-                  onChange={(e) => setPurchaseFormData(prev => ({ ...prev, purpose: e.target.value }))}
-                  placeholder="What is the purpose of this asset?"
-                  rows={3}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Usefulness/Benefits *</label>
-                <Textarea
-                  value={purchaseFormData.useful}
-                  onChange={(e) => setPurchaseFormData(prev => ({ ...prev, useful: e.target.value }))}
-                  placeholder="How will this asset be useful? What benefits will it provide?"
-                  rows={3}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Approximate Costing *</label>
-                  <input
-                    type="text"
-                    value={purchaseFormData.approxCosting}
-                    onChange={(e) => setPurchaseFormData(prev => ({ ...prev, approxCosting: e.target.value }))}
-                    className="w-full px-3 py-2 border rounded-md"
-                    placeholder="₹ 0 (approximate cost)"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Priority</label>
-                  <Select value={purchaseFormData.priority} onValueChange={(value) => setPurchaseFormData(prev => ({ ...prev, priority: value }))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Low">Low</SelectItem>
-                      <SelectItem value="Medium">Medium</SelectItem>
-                      <SelectItem value="High">High</SelectItem>
-                      <SelectItem value="Urgent">Urgent</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Department</label>
-                <Select value={purchaseFormData.department} onValueChange={(value) => setPurchaseFormData(prev => ({ ...prev, department: value }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Computer Science">Computer Science</SelectItem>
-                    <SelectItem value="Mechanical">Mechanical</SelectItem>
-                    <SelectItem value="Electrical">Electrical</SelectItem>
-                    <SelectItem value="Civil">Civil</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex gap-3">
-                <Button onClick={handlePurchaseRequest} className="flex-1">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Submit Purchase Request
-                </Button>
-                <Button variant="outline" onClick={() => setShowPurchaseRequest(false)}>
-                  Cancel
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
 
         {/* Audit Form Dialog */}
         <Dialog open={!!selectedAudit} onOpenChange={() => setSelectedAudit(null)}>

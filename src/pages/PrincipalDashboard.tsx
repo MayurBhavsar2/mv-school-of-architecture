@@ -20,7 +20,7 @@ const PrincipalDashboard = () => {
   const [showAssetAssignments, setShowAssetAssignments] = useState(false);
   const [showReassignDialog, setShowReassignDialog] = useState(false);
   const [showPurchaseRequests, setShowPurchaseRequests] = useState(false);
-  const [showQuotationApprovals, setShowQuotationApprovals] = useState(false);
+  
   const [selectedStaffAssets, setSelectedStaffAssets] = useState<any[]>([]);
   const [selectedStaffName, setSelectedStaffName] = useState("");
   const [newAssignee, setNewAssignee] = useState("");
@@ -145,23 +145,6 @@ const PrincipalDashboard = () => {
     }
   ];
 
-  // Mock quotation approvals data
-  const [quotationApprovals, setQuotationApprovals] = useState([
-    {
-      id: "PR002",
-      assetName: "AutoCAD Licenses",
-      assetType: "Digital",
-      department: "Mechanical",
-      hodName: "Dr. Brown",
-      approxCosting: "₹2,00,000",
-      quotations: [
-        { vendor: "Autodesk Direct", cost: "₹1,95,000", deliveryTime: "5 days", specifications: "50 user licenses, 1-year subscription" },
-        { vendor: "Software Solutions Inc", cost: "₹2,10,000", deliveryTime: "3 days", specifications: "50 user licenses, 1-year subscription + training" },
-        { vendor: "Tech Distributors", cost: "₹1,85,000", deliveryTime: "7 days", specifications: "50 user licenses, 1-year subscription" }
-      ],
-      status: "pending_quotation_approval"
-    }
-  ]);
 
   // Mock purchase requests data
   const [purchaseRequests, setPurchaseRequests] = useState([
@@ -331,24 +314,6 @@ const PrincipalDashboard = () => {
     }
   };
 
-  const handleQuotationApproval = (requestId: string, vendorIndex: number) => {
-    const request = quotationApprovals.find(q => q.id === requestId);
-    if (!request) return;
-
-    const selectedVendor = request.quotations[vendorIndex];
-    
-    // Update the quotation approval status
-    const updatedQuotations = quotationApprovals.map(q => 
-      q.id === requestId ? { ...q, status: "approved", selectedVendor } : q
-    );
-    
-    setQuotationApprovals(updatedQuotations);
-
-    toast({
-      title: "Vendor Selected",
-      description: `${selectedVendor.vendor} selected for ${request.assetName}. Purchase approved and sent back to Faculty.`
-    });
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 p-6">
@@ -374,7 +339,7 @@ const PrincipalDashboard = () => {
               )}
             </Button>
             <Button onClick={() => navigate('/')} variant="outline">
-              Admin Dashboard
+              Faculty Dashboard
             </Button>
           </div>
         </div>
@@ -468,33 +433,6 @@ const PrincipalDashboard = () => {
           </Card>
         </div>
 
-        {/* Quotation Approvals Card */}
-        {quotationApprovals.length > 0 && (
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setShowQuotationApprovals(true)}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileCheck className="h-5 w-5" />
-                Quotation Approvals
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-2xl font-bold">
-                    {quotationApprovals.filter(q => q.status === "pending_quotation_approval").length}
-                  </div>
-                  <p className="text-sm text-muted-foreground">Quotations to review</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-semibold text-blue-600">
-                    {quotationApprovals[0]?.quotations.length || 0}
-                  </div>
-                  <p className="text-xs text-muted-foreground">Vendors</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        )}
 
         {/* Recent Activity */}
         <Card>
@@ -977,73 +915,6 @@ const PrincipalDashboard = () => {
         </Dialog>
         )}
 
-        {/* Quotation Approvals Dialog */}
-        {showQuotationApprovals && (
-          <Dialog open={true} onOpenChange={() => setShowQuotationApprovals(false)}>
-            <DialogContent className="max-w-6xl max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-2">
-                  <FileCheck className="h-5 w-5" />
-                  Review and Select Vendor Quotations
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-6">
-                {quotationApprovals.filter(q => q.status === "pending_quotation_approval").map((request) => (
-                  <div key={request.id} className="border rounded-lg p-6 space-y-4">
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-xl">{request.assetName}</h3>
-                          <Badge variant="outline">{request.assetType}</Badge>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4 text-sm">
-                          <p><strong>Request ID:</strong> {request.id}</p>
-                          <p><strong>Department:</strong> {request.department}</p>
-                          <p><strong>HOD:</strong> {request.hodName}</p>
-                          <p><strong>Approximate Cost:</strong> {request.approxCosting}</p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <h4 className="font-semibold text-lg">Select Best Vendor:</h4>
-                      <div className="grid gap-4">
-                        {request.quotations.map((quotation, index) => (
-                          <div key={index} className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors">
-                            <div className="flex items-center justify-between">
-                              <div className="space-y-2 flex-1">
-                                <div className="flex items-center gap-2">
-                                  <h5 className="font-medium text-lg">{quotation.vendor}</h5>
-                                  <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                    {quotation.cost}
-                                  </Badge>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                                  <p><strong>Delivery:</strong> {quotation.deliveryTime}</p>
-                                  <p><strong>Specifications:</strong> {quotation.specifications}</p>
-                                </div>
-                              </div>
-                              <Button 
-                                onClick={() => handleQuotationApproval(request.id, index)}
-                                className="bg-blue-600 hover:bg-blue-700 ml-4"
-                              >
-                                Select This Vendor
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                
-                {quotationApprovals.filter(q => q.status === "pending_quotation_approval").length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">No quotations pending approval</p>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
     </div>
   );
 };

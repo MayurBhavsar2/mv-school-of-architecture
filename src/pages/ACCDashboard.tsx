@@ -371,7 +371,7 @@ const ACCDashboard = () => {
               </Button>
               <Button variant="outline" size="sm" onClick={() => window.location.href = '/'}>
                 <Settings className="h-4 w-4 mr-2" />
-                Admin Dashboard
+                Faculty Dashboard
               </Button>
               <Dialog>
                 <DialogTrigger asChild>
@@ -445,7 +445,7 @@ const ACCDashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShoppingCart className="h-5 w-5" />
-                Quotation Approvals from Admin
+                Quotation From Faculty
               </CardTitle>
               <CardDescription>
                 Quotations collected by Faculty awaiting your final approval
