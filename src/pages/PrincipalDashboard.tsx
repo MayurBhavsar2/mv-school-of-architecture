@@ -56,6 +56,20 @@ const PrincipalDashboard = () => {
       message: "Hand-over request for Projector to Physics Department",
       timestamp: "2024-01-29 11:20 AM",
       status: "unread"
+    },
+    {
+      id: 5,
+      type: "quotation_submitted",
+      message: "Faculty has collected 3 quotations for AutoCAD Licenses and sent to ACC for final approval",
+      timestamp: "2024-01-30 02:15 PM",
+      status: "unread"
+    },
+    {
+      id: 6,
+      type: "quotation_submitted",
+      message: "Faculty has collected 3 quotations for High-End Workstation and sent to ACC for final approval",
+      timestamp: "2024-01-29 04:30 PM",
+      status: "unread"
     }
   ];
 
@@ -239,6 +253,7 @@ const PrincipalDashboard = () => {
       case "low_stock": return <TrendingDown className="h-4 w-4 text-orange-500" />;
       case "maintenance": return <Wrench className="h-4 w-4 text-yellow-500" />;
       case "approval": return <FileCheck className="h-4 w-4 text-purple-500" />;
+      case "quotation_submitted": return <ShoppingCart className="h-4 w-4 text-green-500" />;
       default: return <Bell className="h-4 w-4" />;
     }
   };
