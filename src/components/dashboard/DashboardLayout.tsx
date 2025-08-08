@@ -35,6 +35,10 @@ export const DashboardLayout = ({ children, onAddAsset }: DashboardLayoutProps) 
                 <Settings className="h-4 w-4 mr-2" />
                 ACC Dashboard
               </Button>
+              <Button variant="outline" size="sm" onClick={() => window.location.href = '/secretary'}>
+                <Settings className="h-4 w-4 mr-2" />
+                Secretary Dashboard
+              </Button>
               <Button variant="outline" size="sm">
                 <Settings className="h-4 w-4 mr-2" />
                 Settings

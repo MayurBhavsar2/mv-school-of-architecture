@@ -13,6 +13,7 @@ import PrincipalAssetsPage from "./pages/PrincipalAssetsPage";
 import PrincipalAuditPage from "./pages/PrincipalAuditPage";
 import HODDashboard from "./pages/HODDashboard";
 import ACCDashboard from "./pages/ACCDashboard";
+import SecretaryDashboard from "./pages/SecretaryDashboard";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,7 @@ const App = () => (
         <Route path="/principal/audit" element={<PrincipalAuditPage />} />
         <Route path="/hod" element={<HODDashboard />} />
         <Route path="/chairman" element={<ACCDashboard />} />
+        <Route path="/secretary" element={<SecretaryDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
