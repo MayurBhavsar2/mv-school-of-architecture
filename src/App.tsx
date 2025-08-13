@@ -14,6 +14,7 @@ import PrincipalAuditPage from "./pages/PrincipalAuditPage";
 import HODDashboard from "./pages/HODDashboard";
 import ACCDashboard from "./pages/ACCDashboard";
 import SecretaryDashboard from "./pages/SecretaryDashboard";
+import TrustManagerDashboard from "./pages/TrustManagerDashboard";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
         <Route path="/hod" element={<HODDashboard />} />
         <Route path="/chairman" element={<ACCDashboard />} />
         <Route path="/secretary" element={<SecretaryDashboard />} />
+        <Route path="/trust-manager" element={<TrustManagerDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
