@@ -18,11 +18,9 @@ const SecretaryDashboard = () => {
   const [showMaintenanceDetails, setShowMaintenanceDetails] = useState(false);
   const [showLowStockDetails, setShowLowStockDetails] = useState(false);
   const [showAssetAssignments, setShowAssetAssignments] = useState(false);
-  const [showReassignDialog, setShowReassignDialog] = useState(false);
+  const [showRecentActivities, setShowRecentActivities] = useState(false);
+  const [showDepartmentOverview, setShowDepartmentOverview] = useState(false);
   
-  const [selectedStaffAssets, setSelectedStaffAssets] = useState<any[]>([]);
-  const [selectedStaffName, setSelectedStaffName] = useState("");
-  const [newAssignee, setNewAssignee] = useState("");
   const [assetFilter, setAssetFilter] = useState("all");
   const { toast } = useToast();
 
@@ -269,7 +267,7 @@ const SecretaryDashboard = () => {
           </Card>
 
           {/* Recent Activities */}
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setShowRecentActivities(true)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Recent Activities</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -286,7 +284,7 @@ const SecretaryDashboard = () => {
           </Card>
 
           {/* Department Overview */}
-          <Card className="hover:shadow-lg transition-shadow">
+          <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => setShowDepartmentOverview(true)}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Department Overview</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
@@ -520,6 +518,140 @@ const SecretaryDashboard = () => {
               </TableBody>
             </Table>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Recent Activities Dialog */}
+      <Dialog open={showRecentActivities} onOpenChange={setShowRecentActivities}>
+        <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Recent Activities</DialogTitle>
+          </DialogHeader>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Time</TableHead>
+                <TableHead>Activity</TableHead>
+                <TableHead>User</TableHead>
+                <TableHead>Department</TableHead>
+                <TableHead>Asset/Item</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>2024-01-30 04:15 PM</TableCell>
+                <TableCell>Asset Assignment</TableCell>
+                <TableCell>Prof. Kumar</TableCell>
+                <TableCell>Computer Science</TableCell>
+                <TableCell>Laptop (AST001)</TableCell>
+                <TableCell><Badge variant="secondary">Completed</Badge></TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>2024-01-30 03:45 PM</TableCell>
+                <TableCell>Quotation Approval</TableCell>
+                <TableCell>Mr. Sharma (ACC)</TableCell>
+                <TableCell>Civil Engineering</TableCell>
+                <TableCell>AutoCAD Licenses</TableCell>
+                <TableCell><Badge variant="default">Pending Secretary</Badge></TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>2024-01-30 02:30 PM</TableCell>
+                <TableCell>Asset Registration</TableCell>
+                <TableCell>Dr. Patel</TableCell>
+                <TableCell>Chemistry</TableCell>
+                <TableCell>Microscope (AST012)</TableCell>
+                <TableCell><Badge variant="secondary">Completed</Badge></TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>2024-01-30 01:15 PM</TableCell>
+                <TableCell>Maintenance Request</TableCell>
+                <TableCell>Prof. Singh</TableCell>
+                <TableCell>Mechanical</TableCell>
+                <TableCell>3D Printer (AST008)</TableCell>
+                <TableCell><Badge variant="destructive">Urgent</Badge></TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>2024-01-30 11:30 AM</TableCell>
+                <TableCell>Stock Update</TableCell>
+                <TableCell>Admin Staff</TableCell>
+                <TableCell>Administration</TableCell>
+                <TableCell>Printer Paper</TableCell>
+                <TableCell><Badge variant="default">Low Stock</Badge></TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </DialogContent>
+      </Dialog>
+
+      {/* Department Overview Dialog */}
+      <Dialog open={showDepartmentOverview} onOpenChange={setShowDepartmentOverview}>
+        <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Department Overview</DialogTitle>
+          </DialogHeader>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Department</TableHead>
+                <TableHead>Total Assets</TableHead>
+                <TableHead>Active Assets</TableHead>
+                <TableHead>Maintenance Due</TableHead>
+                <TableHead>HOD</TableHead>
+                <TableHead>Last Activity</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell className="font-medium">Computer Science</TableCell>
+                <TableCell>145</TableCell>
+                <TableCell>132</TableCell>
+                <TableCell>3</TableCell>
+                <TableCell>Prof. Kumar</TableCell>
+                <TableCell>2024-01-30</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Civil Engineering</TableCell>
+                <TableCell>98</TableCell>
+                <TableCell>89</TableCell>
+                <TableCell>5</TableCell>
+                <TableCell>Dr. Sharma</TableCell>
+                <TableCell>2024-01-30</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Mechanical Engineering</TableCell>
+                <TableCell>167</TableCell>
+                <TableCell>154</TableCell>
+                <TableCell>8</TableCell>
+                <TableCell>Prof. Singh</TableCell>
+                <TableCell>2024-01-29</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Electrical Engineering</TableCell>
+                <TableCell>123</TableCell>
+                <TableCell>118</TableCell>
+                <TableCell>2</TableCell>
+                <TableCell>Dr. Patel</TableCell>
+                <TableCell>2024-01-30</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Chemistry</TableCell>
+                <TableCell>89</TableCell>
+                <TableCell>85</TableCell>
+                <TableCell>4</TableCell>
+                <TableCell>Prof. Gupta</TableCell>
+                <TableCell>2024-01-30</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell className="font-medium">Physics</TableCell>
+                <TableCell>76</TableCell>
+                <TableCell>71</TableCell>
+                <TableCell>1</TableCell>
+                <TableCell>Dr. Verma</TableCell>
+                <TableCell>2024-01-29</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </DialogContent>
       </Dialog>
     </div>
