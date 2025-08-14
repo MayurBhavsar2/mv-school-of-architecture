@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { X, Plus, Trash2 } from "lucide-react";
 
 interface DigitalAssetFormProps {
   onClose: () => void;
@@ -12,6 +14,38 @@ interface DigitalAssetFormProps {
 
 export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
   const [assetId] = useState(`DIG${Date.now().toString().slice(-6)}`);
+  const [quantity, setQuantity] = useState(1);
+  const [licenseKeys, setLicenseKeys] = useState<string[]>([""]);
+  const [licenseKeyFiles, setLicenseKeyFiles] = useState<File[]>([]);
+
+  const handleQuantityChange = (newQuantity: number) => {
+    setQuantity(newQuantity);
+    const currentKeys = [...licenseKeys];
+    
+    if (newQuantity > currentKeys.length) {
+      // Add more license key fields
+      const additionalKeys = Array(newQuantity - currentKeys.length).fill("");
+      setLicenseKeys([...currentKeys, ...additionalKeys]);
+    } else if (newQuantity < currentKeys.length) {
+      // Remove excess license key fields
+      setLicenseKeys(currentKeys.slice(0, newQuantity));
+      setLicenseKeyFiles(licenseKeyFiles.slice(0, newQuantity));
+    }
+  };
+
+  const handleLicenseKeyChange = (index: number, value: string) => {
+    const updatedKeys = [...licenseKeys];
+    updatedKeys[index] = value;
+    setLicenseKeys(updatedKeys);
+  };
+
+  const handleLicenseFileChange = (index: number, file: File | null) => {
+    const updatedFiles = [...licenseKeyFiles];
+    if (file) {
+      updatedFiles[index] = file;
+    }
+    setLicenseKeyFiles(updatedFiles);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,8 +79,16 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
                 <Input id="id" value={assetId} readOnly className="bg-muted" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="licenseKey">License Key *</Label>
-                <Input id="licenseKey" placeholder="Enter license key" required />
+                <Label htmlFor="quantity">Quantity (Licenses) *</Label>
+                <Input 
+                  id="quantity" 
+                  type="number" 
+                  min="1"
+                  value={quantity}
+                  onChange={(e) => handleQuantityChange(Number(e.target.value))}
+                  placeholder="Number of licenses" 
+                  required 
+                />
               </div>
             </div>
 
@@ -65,14 +107,30 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
               </div>
             </div>
 
+            {/* License Keys */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">License Keys</h3>
+              <p className="text-sm text-muted-foreground">Enter unique license key for each license</p>
+              <div className="space-y-3">
+                {licenseKeys.map((licenseKey, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Label className="min-w-[120px]">License {index + 1} *</Label>
+                    <Input
+                      value={licenseKey}
+                      onChange={(e) => handleLicenseKeyChange(index, e.target.value)}
+                      placeholder={`Enter license key ${index + 1}`}
+                      required
+                      className="flex-1"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* License Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">License Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="quantity">Quantity *</Label>
-                  <Input id="quantity" type="number" placeholder="Number of licenses" required />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="activationDate">Activation Date *</Label>
                   <Input id="activationDate" type="date" required />
@@ -80,6 +138,36 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
                 <div className="space-y-2">
                   <Label htmlFor="expiryDate">Expiry Date *</Label>
                   <Input id="expiryDate" type="date" required />
+                </div>
+              </div>
+            </div>
+
+            {/* Returns Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Returns Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="returnQuantity">Return Quantity</Label>
+                  <Input id="returnQuantity" type="number" min="0" placeholder="Enter return quantity" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="returnReason">Return Reason</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select return reason" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="defective-license">Defective License</SelectItem>
+                      <SelectItem value="wrong-version">Wrong Version</SelectItem>
+                      <SelectItem value="excess-quantity">Excess Quantity</SelectItem>
+                      <SelectItem value="incompatible">Incompatible</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="returnNotes">Return Notes</Label>
+                  <Textarea id="returnNotes" placeholder="Additional return details" />
                 </div>
               </div>
             </div>
@@ -106,11 +194,25 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
             {/* Documentation */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Documentation</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="licenseKeyPicture">License Key Picture</Label>
-                  <Input id="licenseKeyPicture" type="file" accept="image/*" />
-                </div>
+              
+              {/* License Key Pictures */}
+              <div className="space-y-3">
+                <Label>License Key Pictures</Label>
+                <p className="text-sm text-muted-foreground">Upload picture for each license key</p>
+                {licenseKeys.map((_, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Label className="min-w-[120px]">License {index + 1} Pic</Label>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleLicenseFileChange(index, e.target.files?.[0] || null)}
+                      className="flex-1"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="invoice">Invoice</Label>
                   <Input id="invoice" type="file" accept=".pdf,.jpg,.jpeg,.png" />

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 
@@ -85,16 +86,40 @@ export const ConsumableAssetForm = ({ onClose }: ConsumableAssetFormProps) => {
                   <Input id="quantity" type="number" placeholder="Enter quantity" required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="returnQuantity">Return Quantity</Label>
-                  <Input id="returnQuantity" type="number" placeholder="Return quantity" />
-                </div>
-                <div className="space-y-2">
                   <Label htmlFor="date">Date *</Label>
                   <Input id="date" type="date" required />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="alertThreshold">Alert Threshold *</Label>
                   <Input id="alertThreshold" type="number" placeholder="Min stock level" required />
+                </div>
+              </div>
+
+              <h4 className="text-md font-medium mt-4">Returns Information</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="returnQuantity">Return Quantity</Label>
+                  <Input id="returnQuantity" type="number" min="0" placeholder="Return quantity" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="returnReason">Return Reason</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select return reason" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="damaged">Damaged</SelectItem>
+                      <SelectItem value="expired">Expired</SelectItem>
+                      <SelectItem value="wrong-item">Wrong Item</SelectItem>
+                      <SelectItem value="excess-quantity">Excess Quantity</SelectItem>
+                      <SelectItem value="quality-issue">Quality Issue</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="returnNotes">Return Notes</Label>
+                  <Textarea id="returnNotes" placeholder="Additional return details" />
                 </div>
               </div>
             </div>

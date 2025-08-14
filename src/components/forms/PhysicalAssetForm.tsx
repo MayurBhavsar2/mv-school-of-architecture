@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { X, Plus, Trash2 } from "lucide-react";
 
 interface PhysicalAssetFormProps {
   onClose: () => void;
@@ -14,6 +14,28 @@ interface PhysicalAssetFormProps {
 
 export const PhysicalAssetForm = ({ onClose }: PhysicalAssetFormProps) => {
   const [assetId] = useState(`PHY${Date.now().toString().slice(-6)}`);
+  const [quantity, setQuantity] = useState(1);
+  const [gpsDeviceIds, setGpsDeviceIds] = useState<string[]>([""]);
+
+  const handleQuantityChange = (newQuantity: number) => {
+    setQuantity(newQuantity);
+    const currentIds = [...gpsDeviceIds];
+    
+    if (newQuantity > currentIds.length) {
+      // Add more GPS device ID fields
+      const additionalIds = Array(newQuantity - currentIds.length).fill("");
+      setGpsDeviceIds([...currentIds, ...additionalIds]);
+    } else if (newQuantity < currentIds.length) {
+      // Remove excess GPS device ID fields
+      setGpsDeviceIds(currentIds.slice(0, newQuantity));
+    }
+  };
+
+  const handleGpsIdChange = (index: number, value: string) => {
+    const updatedIds = [...gpsDeviceIds];
+    updatedIds[index] = value;
+    setGpsDeviceIds(updatedIds);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,8 +69,16 @@ export const PhysicalAssetForm = ({ onClose }: PhysicalAssetFormProps) => {
                 <Input id="id" value={assetId} readOnly className="bg-muted" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="gpsDeviceId">GPS Device ID *</Label>
-                <Input id="gpsDeviceId" placeholder="Enter GPS device ID" required />
+                <Label htmlFor="quantity">Quantity *</Label>
+                <Input 
+                  id="quantity" 
+                  type="number" 
+                  min="1"
+                  value={quantity}
+                  onChange={(e) => handleQuantityChange(Number(e.target.value))}
+                  placeholder="Enter quantity" 
+                  required 
+                />
               </div>
             </div>
 
@@ -86,6 +116,26 @@ export const PhysicalAssetForm = ({ onClose }: PhysicalAssetFormProps) => {
               </div>
             </div>
 
+            {/* GPS Device IDs */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">GPS Device Information</h3>
+              <p className="text-sm text-muted-foreground">Enter unique GPS device ID for each asset</p>
+              <div className="space-y-3">
+                {gpsDeviceIds.map((gpsId, index) => (
+                  <div key={index} className="flex items-center space-x-2">
+                    <Label className="min-w-[120px]">GPS ID {index + 1} *</Label>
+                    <Input
+                      value={gpsId}
+                      onChange={(e) => handleGpsIdChange(index, e.target.value)}
+                      placeholder={`Enter GPS device ID for asset ${index + 1}`}
+                      required
+                      className="flex-1"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+
             {/* Maintenance Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Maintenance Information</h3>
@@ -115,17 +165,33 @@ export const PhysicalAssetForm = ({ onClose }: PhysicalAssetFormProps) => {
               </div>
             </div>
 
-            {/* Quantity and Returns */}
+            {/* Returns Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Quantity and Returns</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="text-lg font-semibold">Returns Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="quantity">Quantity *</Label>
-                  <Input id="quantity" type="number" placeholder="Enter quantity" required />
+                  <Label htmlFor="returnQuantity">Return Quantity</Label>
+                  <Input id="returnQuantity" type="number" min="0" placeholder="Enter return quantity" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="return">Return Policy</Label>
-                  <Textarea id="return" placeholder="Enter return policy details" />
+                  <Label htmlFor="returnReason">Return Reason</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select return reason" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="damaged">Damaged</SelectItem>
+                      <SelectItem value="defective">Defective</SelectItem>
+                      <SelectItem value="wrong-specification">Wrong Specification</SelectItem>
+                      <SelectItem value="excess-quantity">Excess Quantity</SelectItem>
+                      <SelectItem value="quality-issue">Quality Issue</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="returnPolicy">Return Policy</Label>
+                  <Textarea id="returnPolicy" placeholder="Enter return policy details" />
                 </div>
               </div>
             </div>
