@@ -7,8 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { QRScannerComponent } from "@/components/ui/qr-scanner";
+import { parseAssetQRData } from "@/utils/qrCode";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { X, Scan } from "lucide-react";
 
 interface HandOverFormData {
   assetName: string;
@@ -29,7 +31,20 @@ interface HandOverFormProps {
 
 export const HandOverForm = ({ onClose }: HandOverFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<HandOverFormData>();
+  const [showQRScanner, setShowQRScanner] = useState(false);
+  const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<HandOverFormData>();
+
+  const handleQRScan = (qrData: string) => {
+    const assetData = parseAssetQRData(qrData);
+    if (assetData) {
+      setValue("assetId", assetData.assetId);
+      setValue("assetName", assetData.assetName);
+      setValue("assetType", assetData.assetType);
+      toast.success("Asset details filled from QR code!");
+    } else {
+      toast.error("Invalid QR code format");
+    }
+  };
 
   const onSubmit = async (data: HandOverFormData) => {
     setIsSubmitting(true);
@@ -64,6 +79,18 @@ export const HandOverForm = ({ onClose }: HandOverFormProps) => {
               <CardTitle className="text-lg">Asset Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              <div className="flex justify-end mb-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowQRScanner(true)}
+                  className="gap-2"
+                >
+                  <Scan className="h-4 w-4" />
+                  Scan QR Code
+                </Button>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="assetName">Asset Name *</Label>
@@ -210,6 +237,13 @@ export const HandOverForm = ({ onClose }: HandOverFormProps) => {
           </div>
         </form>
       </DialogContent>
+      
+      <QRScannerComponent
+        isOpen={showQRScanner}
+        onClose={() => setShowQRScanner(false)}
+        onScanSuccess={handleQRScan}
+        onError={(error) => toast.error(error)}
+      />
     </Dialog>
   );
 };

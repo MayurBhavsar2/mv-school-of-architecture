@@ -1,12 +1,14 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Search, Filter, MapPin, Edit, Eye } from "lucide-react";
+import { ArrowLeft, Plus, Search, Filter, MapPin, Edit, Eye, QrCode } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { QRDisplay } from "@/components/ui/qr-display";
 import { AssetTypeSelector } from "@/components/forms/AssetTypeSelector";
+import { AssetQRData, generateAssetId } from "@/utils/qrCode";
 import { useState } from "react";
 
 const AssetsPage = () => {
@@ -15,6 +17,8 @@ const AssetsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [selectedAssetForQR, setSelectedAssetForQR] = useState<AssetQRData | null>(null);
 
   // Mock data for different categories
   const mockData = {
@@ -149,6 +153,18 @@ const AssetsPage = () => {
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleShowQR = (asset: any) => {
+    const qrData: AssetQRData = {
+      assetId: asset.id,
+      assetName: asset.name,
+      assetType: asset.type,
+      category: category || 'total',
+      registrationDate: new Date().toLocaleDateString()
+    };
+    setSelectedAssetForQR(qrData);
+    setShowQRCode(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -215,6 +231,7 @@ const AssetsPage = () => {
                   <TableHead>Quantity</TableHead>
                   <TableHead>Vendor</TableHead>
                   <TableHead>Picture</TableHead>
+                  <TableHead>QR Code</TableHead>
                   <TableHead>Status</TableHead>
                   {category === 'maintenance' && <TableHead>Due Date</TableHead>}
                   <TableHead>Actions</TableHead>
@@ -246,6 +263,17 @@ const AssetsPage = () => {
                       ) : (
                         "No picture"
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleShowQR(item)}
+                        className="gap-1"
+                      >
+                        <QrCode className="h-3 w-3" />
+                        QR
+                      </Button>
                     </TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(item.status)}>
@@ -299,6 +327,17 @@ const AssetsPage = () => {
 
       {showAssetForm && (
         <AssetTypeSelector onClose={() => setShowAssetForm(false)} />
+      )}
+
+      {showQRCode && selectedAssetForQR && (
+        <QRDisplay
+          isOpen={showQRCode}
+          onClose={() => {
+            setShowQRCode(false);
+            setSelectedAssetForQR(null);
+          }}
+          assetData={selectedAssetForQR}
+        />
       )}
     </div>
   );
