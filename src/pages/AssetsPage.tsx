@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QRDisplay } from "@/components/ui/qr-display";
 import { EnhancedQRScanner } from "@/components/ui/enhanced-qr-scanner";
+import { QRScanOptions } from "@/components/ui/qr-scan-options";
 import { AssetTypeSelector } from "@/components/forms/AssetTypeSelector";
 import { AssetQRData, generateAssetId, parseAssetQRData } from "@/utils/qrCode";
 import { toast } from "sonner";
@@ -21,6 +22,8 @@ const AssetsPage = () => {
   const [showAssetForm, setShowAssetForm] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
   const [showQRScanner, setShowQRScanner] = useState(false);
+  const [showScanOptions, setShowScanOptions] = useState(false);
+  const [scanLocation, setScanLocation] = useState<{ latitude: number; longitude: number } | undefined>();
   const [selectedAssetForQR, setSelectedAssetForQR] = useState<AssetQRData | null>(null);
 
   // Mock data for different categories
@@ -178,6 +181,27 @@ const AssetsPage = () => {
     console.log("Audit request:", assetData, "at location:", location);
   };
 
+  // Test function to simulate QR scanning and show options
+  const simulateQRScan = (asset: any) => {
+    const qrData: AssetQRData = {
+      assetId: asset.id,
+      assetName: asset.name,
+      assetType: asset.type,
+      category: category || 'total',
+      registrationDate: new Date().toLocaleDateString()
+    };
+    
+    // Simulate location
+    const mockLocation = { latitude: 40.7128, longitude: -74.0060 };
+    
+    console.log("Simulating QR scan for:", qrData);
+    
+    // Create a simple options dialog state
+    setSelectedAssetForQR(qrData);
+    setScanLocation(mockLocation);
+    setShowScanOptions(true);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -278,15 +302,26 @@ const AssetsPage = () => {
                       )}
                     </TableCell>
                      <TableCell>
-                       <Button 
-                         variant="outline" 
-                         size="sm"
-                         onClick={() => handleShowQR(item)}
-                         className="gap-1"
-                       >
-                         <QrCode className="h-3 w-3" />
-                         Generate QR
-                       </Button>
+                       <div className="flex gap-1">
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                           onClick={() => handleShowQR(item)}
+                           className="gap-1"
+                         >
+                           <QrCode className="h-3 w-3" />
+                           Generate QR
+                         </Button>
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                           onClick={() => simulateQRScan(item)}
+                           className="gap-1"
+                         >
+                           🔍
+                           Test Scan
+                         </Button>
+                       </div>
                      </TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(item.status)}>
@@ -360,6 +395,31 @@ const AssetsPage = () => {
         onAuditRequest={handleAuditFromQR}
         onError={(error) => toast.error(error)}
       />
+
+      {selectedAssetForQR && (
+        <QRScanOptions
+          isOpen={showScanOptions}
+          onClose={() => {
+            setShowScanOptions(false);
+            setSelectedAssetForQR(null);
+            setScanLocation(undefined);
+          }}
+          assetData={selectedAssetForQR}
+          scanLocation={scanLocation}
+          onHandoverRequest={() => {
+            if (selectedAssetForQR) {
+              handleHandoverFromQR(selectedAssetForQR, scanLocation);
+              setShowScanOptions(false);
+            }
+          }}
+          onAuditRequest={() => {
+            if (selectedAssetForQR) {
+              handleAuditFromQR(selectedAssetForQR, scanLocation);
+              setShowScanOptions(false);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

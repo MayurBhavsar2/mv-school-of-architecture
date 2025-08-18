@@ -106,6 +106,28 @@ const PrincipalAssetsPage = () => {
     console.log("Demo audit request:", assetData, "at location:", location);
   };
 
+  // Test function to simulate QR scanning  
+  const simulateQRScan = (asset: any) => {
+    const qrData: AssetQRData = {
+      assetId: asset.id,
+      assetName: asset.name,
+      assetType: asset.type,
+      category: 'demo',
+      registrationDate: new Date().toLocaleDateString()
+    };
+    
+    // Simulate location
+    const mockLocation = { latitude: 40.7128, longitude: -74.0060 };
+    
+    console.log("Simulating demo QR scan for:", qrData);
+    setShowQRScanner(true);
+    
+    // Simulate the scan after a short delay
+    setTimeout(() => {
+      handleHandoverFromQR(qrData, mockLocation);
+    }, 1000);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -241,15 +263,26 @@ const PrincipalAssetsPage = () => {
                        )}
                      </TableCell>
                      <TableCell>
-                       <Button 
-                         variant="outline" 
-                         size="sm"
-                         onClick={() => handleShowQR(item)}
-                         className="gap-1"
-                       >
-                         <QrCode className="h-3 w-3" />
-                         Generate QR
-                       </Button>
+                       <div className="flex gap-1">
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                           onClick={() => handleShowQR(item)}
+                           className="gap-1"
+                         >
+                           <QrCode className="h-3 w-3" />
+                           Generate QR
+                         </Button>
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                           onClick={() => simulateQRScan(item)}
+                           className="gap-1"
+                         >
+                           🔍
+                           Test Scan
+                         </Button>
+                       </div>
                      </TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(item.status)}>

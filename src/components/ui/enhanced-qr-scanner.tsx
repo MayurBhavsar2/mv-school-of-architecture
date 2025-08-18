@@ -39,6 +39,21 @@ export const EnhancedQRScanner: React.FC<EnhancedQRScannerProps> = ({
   const [scanLocation, setScanLocation] = useState<{ latitude: number; longitude: number } | undefined>();
   const [isGettingLocation, setIsGettingLocation] = useState(false);
 
+  // Add method to simulate scan from external trigger
+  const simulateScan = (assetData: AssetQRData, location?: { latitude: number; longitude: number }) => {
+    setScannedAsset(assetData);
+    setShowOptions(true);
+    setScanLocation(location);
+    
+    // Record scan activity
+    recordScanActivity(assetData, location);
+    
+    // Stop scanner if running
+    if (qrScannerRef.current) {
+      qrScannerRef.current.stop();
+    }
+  };
+
   // Get user's current location
   const getCurrentLocation = (): Promise<{ latitude: number; longitude: number }> => {
     return new Promise((resolve, reject) => {
