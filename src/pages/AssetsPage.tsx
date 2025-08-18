@@ -7,8 +7,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QRDisplay } from "@/components/ui/qr-display";
+import { EnhancedQRScanner } from "@/components/ui/enhanced-qr-scanner";
 import { AssetTypeSelector } from "@/components/forms/AssetTypeSelector";
-import { AssetQRData, generateAssetId } from "@/utils/qrCode";
+import { AssetQRData, generateAssetId, parseAssetQRData } from "@/utils/qrCode";
+import { toast } from "sonner";
 import { useState } from "react";
 
 const AssetsPage = () => {
@@ -18,6 +20,7 @@ const AssetsPage = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showAssetForm, setShowAssetForm] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [showQRScanner, setShowQRScanner] = useState(false);
   const [selectedAssetForQR, setSelectedAssetForQR] = useState<AssetQRData | null>(null);
 
   // Mock data for different categories
@@ -165,6 +168,16 @@ const AssetsPage = () => {
     setShowQRCode(true);
   };
 
+  const handleHandoverFromQR = (assetData: AssetQRData, location?: { latitude: number; longitude: number }) => {
+    toast.success(`Handover request for ${assetData.assetName}!`);
+    console.log("Handover request:", assetData, "at location:", location);
+  };
+
+  const handleAuditFromQR = (assetData: AssetQRData, location?: { latitude: number; longitude: number }) => {
+    toast.success(`Audit request for ${assetData.assetName}!`);
+    console.log("Audit request:", assetData, "at location:", location);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -264,17 +277,17 @@ const AssetsPage = () => {
                         "No picture"
                       )}
                     </TableCell>
-                    <TableCell>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleShowQR(item)}
-                        className="gap-1"
-                      >
-                        <QrCode className="h-3 w-3" />
-                        QR
-                      </Button>
-                    </TableCell>
+                     <TableCell>
+                       <Button 
+                         variant="outline" 
+                         size="sm"
+                         onClick={() => setShowQRScanner(true)}
+                         className="gap-1"
+                       >
+                         <QrCode className="h-3 w-3" />
+                         Scan QR
+                       </Button>
+                     </TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(item.status)}>
                         {item.status}
@@ -339,6 +352,14 @@ const AssetsPage = () => {
           assetData={selectedAssetForQR}
         />
       )}
+
+      <EnhancedQRScanner
+        isOpen={showQRScanner}
+        onClose={() => setShowQRScanner(false)}
+        onHandoverRequest={handleHandoverFromQR}
+        onAuditRequest={handleAuditFromQR}
+        onError={(error) => toast.error(error)}
+      />
     </div>
   );
 };

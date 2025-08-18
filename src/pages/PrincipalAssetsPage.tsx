@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Search, Filter, Eye, MapPin } from "lucide-react";
+import { EnhancedQRScanner } from "@/components/ui/enhanced-qr-scanner";
+import { AssetQRData } from "@/utils/qrCode";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +17,7 @@ const PrincipalAssetsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [assetFilter, setAssetFilter] = useState("all");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [showQRScanner, setShowQRScanner] = useState(false);
 
   // Same mock data as faculty but without edit capabilities
   const allAssets = [
@@ -76,6 +80,16 @@ const PrincipalAssetsPage = () => {
     const matchesFilter = assetFilter === "all" || item.type.toLowerCase() === assetFilter.toLowerCase();
     return matchesSearch && matchesFilter;
   });
+
+  const handleHandoverFromQR = (assetData: AssetQRData, location?: { latitude: number; longitude: number }) => {
+    toast.success(`Demo: Handover request for ${assetData.assetName}!`);
+    console.log("Demo handover request:", assetData, "at location:", location);
+  };
+
+  const handleAuditFromQR = (assetData: AssetQRData, location?: { latitude: number; longitude: number }) => {
+    toast.success(`Demo: Audit request for ${assetData.assetName}!`);
+    console.log("Demo audit request:", assetData, "at location:", location);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80 p-6">
@@ -180,9 +194,10 @@ const PrincipalAssetsPage = () => {
                   <TableHead>Location/License</TableHead>
                   <TableHead>Quantity</TableHead>
                   <TableHead>Vendor</TableHead>
-                  <TableHead>Picture</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Actions</TableHead>
+                   <TableHead>Picture</TableHead>
+                   <TableHead>QR Code</TableHead>
+                   <TableHead>Status</TableHead>
+                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -196,20 +211,31 @@ const PrincipalAssetsPage = () => {
                     <TableCell>{item.location || item.licenseKey || item.unitType || 'N/A'}</TableCell>
                     <TableCell>{item.quantity || 'N/A'}</TableCell>
                     <TableCell>{item.vendor}</TableCell>
-                    <TableCell>
-                      {item.picture ? (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => setSelectedImage(item.picture)}
-                        >
-                          <Eye className="h-3 w-3 mr-1" />
-                          View
-                        </Button>
-                      ) : (
-                        "No picture"
-                      )}
-                    </TableCell>
+                     <TableCell>
+                       {item.picture ? (
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                           onClick={() => setSelectedImage(item.picture)}
+                         >
+                           <Eye className="h-3 w-3 mr-1" />
+                           View
+                         </Button>
+                       ) : (
+                         "No picture"
+                       )}
+                     </TableCell>
+                     <TableCell>
+                       <Button 
+                         variant="outline" 
+                         size="sm"
+                         onClick={() => setShowQRScanner(true)}
+                         className="gap-1"
+                       >
+                         <Eye className="h-3 w-3" />
+                         Demo QR
+                       </Button>
+                     </TableCell>
                     <TableCell>
                       <Badge variant={getStatusVariant(item.status)}>
                         {item.status}
@@ -248,6 +274,14 @@ const PrincipalAssetsPage = () => {
           </DialogContent>
         </Dialog>
       )}
+
+      <EnhancedQRScanner
+        isOpen={showQRScanner}
+        onClose={() => setShowQRScanner(false)}
+        onHandoverRequest={handleHandoverFromQR}
+        onAuditRequest={handleAuditFromQR}
+        onError={(error) => toast.error(error)}
+      />
     </div>
   );
 };
