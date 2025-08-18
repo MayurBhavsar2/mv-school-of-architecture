@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Search, Filter, Eye, MapPin } from "lucide-react";
+import { ArrowLeft, Search, Filter, Eye, MapPin, QrCode } from "lucide-react";
 import { EnhancedQRScanner } from "@/components/ui/enhanced-qr-scanner";
+import { QRDisplay } from "@/components/ui/qr-display";
 import { AssetQRData } from "@/utils/qrCode";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,8 @@ const PrincipalAssetsPage = () => {
   const [assetFilter, setAssetFilter] = useState("all");
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showQRScanner, setShowQRScanner] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [selectedAssetForQR, setSelectedAssetForQR] = useState<AssetQRData | null>(null);
 
   // Same mock data as faculty but without edit capabilities
   const allAssets = [
@@ -80,6 +83,18 @@ const PrincipalAssetsPage = () => {
     const matchesFilter = assetFilter === "all" || item.type.toLowerCase() === assetFilter.toLowerCase();
     return matchesSearch && matchesFilter;
   });
+
+  const handleShowQR = (asset: any) => {
+    const qrData: AssetQRData = {
+      assetId: asset.id,
+      assetName: asset.name,
+      assetType: asset.type,
+      category: 'demo',
+      registrationDate: new Date().toLocaleDateString()
+    };
+    setSelectedAssetForQR(qrData);
+    setShowQRCode(true);
+  };
 
   const handleHandoverFromQR = (assetData: AssetQRData, location?: { latitude: number; longitude: number }) => {
     toast.success(`Demo: Handover request for ${assetData.assetName}!`);
@@ -229,11 +244,11 @@ const PrincipalAssetsPage = () => {
                        <Button 
                          variant="outline" 
                          size="sm"
-                         onClick={() => setShowQRScanner(true)}
+                         onClick={() => handleShowQR(item)}
                          className="gap-1"
                        >
-                         <Eye className="h-3 w-3" />
-                         Demo QR
+                         <QrCode className="h-3 w-3" />
+                         Generate QR
                        </Button>
                      </TableCell>
                     <TableCell>
@@ -273,6 +288,17 @@ const PrincipalAssetsPage = () => {
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {showQRCode && selectedAssetForQR && (
+        <QRDisplay
+          isOpen={showQRCode}
+          onClose={() => {
+            setShowQRCode(false);
+            setSelectedAssetForQR(null);
+          }}
+          assetData={selectedAssetForQR}
+        />
       )}
 
       <EnhancedQRScanner

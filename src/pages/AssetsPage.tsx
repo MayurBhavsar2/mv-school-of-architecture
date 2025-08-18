@@ -281,11 +281,11 @@ const AssetsPage = () => {
                        <Button 
                          variant="outline" 
                          size="sm"
-                         onClick={() => setShowQRScanner(true)}
+                         onClick={() => handleShowQR(item)}
                          className="gap-1"
                        >
                          <QrCode className="h-3 w-3" />
-                         Scan QR
+                         Generate QR
                        </Button>
                      </TableCell>
                     <TableCell>
