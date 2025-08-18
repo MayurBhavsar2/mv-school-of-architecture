@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Settings, Bell } from "lucide-react";
+import { Plus, Settings, Bell, QrCode } from "lucide-react";
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -42,6 +42,10 @@ export const DashboardLayout = ({ children, onAddAsset }: DashboardLayoutProps) 
               <Button variant="outline" size="sm" onClick={() => window.location.href = '/trust-manager'}>
                 <Settings className="h-4 w-4 mr-2" />
                 Trust Manager
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => window.location.href = '/qr-management'}>
+                <QrCode className="h-4 w-4 mr-2" />
+                QR Management
               </Button>
               <Button variant="outline" size="sm">
                 <Settings className="h-4 w-4 mr-2" />

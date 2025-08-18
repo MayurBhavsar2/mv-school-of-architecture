@@ -15,6 +15,7 @@ import HODDashboard from "./pages/HODDashboard";
 import ACCDashboard from "./pages/ACCDashboard";
 import SecretaryDashboard from "./pages/SecretaryDashboard";
 import TrustManagerDashboard from "./pages/TrustManagerDashboard";
+import QRManagementPage from "./pages/QRManagementPage";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/assets/:category" element={<AssetsPage />} />
           <Route path="/alerts" element={<AlertsPage />} />
           <Route path="/handover" element={<HandOverPage />} />
+          <Route path="/qr-management" element={<QRManagementPage />} />
         <Route path="/principal" element={<PrincipalDashboard />} />
         <Route path="/principal/assets" element={<PrincipalAssetsPage />} />
         <Route path="/principal/audit" element={<PrincipalAuditPage />} />

@@ -7,8 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { QRScannerComponent } from "@/components/ui/qr-scanner";
-import { parseAssetQRData } from "@/utils/qrCode";
+import { EnhancedQRScanner } from "@/components/ui/enhanced-qr-scanner";
+import { parseAssetQRData, AssetQRData } from "@/utils/qrCode";
 import { toast } from "sonner";
 import { X, Scan } from "lucide-react";
 
@@ -34,16 +34,23 @@ export const HandOverForm = ({ onClose }: HandOverFormProps) => {
   const [showQRScanner, setShowQRScanner] = useState(false);
   const { register, handleSubmit, formState: { errors }, reset, setValue } = useForm<HandOverFormData>();
 
-  const handleQRScan = (qrData: string) => {
-    const assetData = parseAssetQRData(qrData);
-    if (assetData) {
-      setValue("assetId", assetData.assetId);
-      setValue("assetName", assetData.assetName);
-      setValue("assetType", assetData.assetType);
-      toast.success("Asset details filled from QR code!");
-    } else {
-      toast.error("Invalid QR code format");
-    }
+  const handleHandoverFromQR = (assetData: AssetQRData, location?: { latitude: number; longitude: number }) => {
+    setValue("assetId", assetData.assetId);
+    setValue("assetName", assetData.assetName);
+    setValue("assetType", assetData.assetType);
+    
+    // Auto-fill current date and generate pre-filled data
+    const today = new Date().toISOString().split('T')[0];
+    setValue("date", today);
+    
+    toast.success("Asset details filled from QR code!");
+    console.log("QR scan location:", location);
+  };
+
+  const handleAuditFromQR = (assetData: AssetQRData, location?: { latitude: number; longitude: number }) => {
+    // This would open an audit form - for now just show message
+    toast.info("Audit functionality will be available soon!");
+    console.log("Audit request for:", assetData, "at location:", location);
   };
 
   const onSubmit = async (data: HandOverFormData) => {
@@ -238,10 +245,11 @@ export const HandOverForm = ({ onClose }: HandOverFormProps) => {
         </form>
       </DialogContent>
       
-      <QRScannerComponent
+      <EnhancedQRScanner
         isOpen={showQRScanner}
         onClose={() => setShowQRScanner(false)}
-        onScanSuccess={handleQRScan}
+        onHandoverRequest={handleHandoverFromQR}
+        onAuditRequest={handleAuditFromQR}
         onError={(error) => toast.error(error)}
       />
     </Dialog>
