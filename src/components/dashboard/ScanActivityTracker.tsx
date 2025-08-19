@@ -27,6 +27,42 @@ export const ScanActivityTracker: React.FC = () => {
       // Sort by most recent first
       parsed.sort((a: ScanActivity, b: ScanActivity) => b.scanTime.getTime() - a.scanTime.getTime());
       setActivities(parsed);
+    } else {
+      // Add sample data for demonstration
+      const sampleActivities: ScanActivity[] = [
+        {
+          id: '1',
+          assetId: 'AST-2024-001',
+          assetName: 'Dell Laptop XPS 15',
+          scanTime: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
+          location: { latitude: 6.5244, longitude: 3.3792 },
+          action: 'handover'
+        },
+        {
+          id: '2',
+          assetId: 'AST-2024-002',
+          assetName: 'HP Printer LaserJet Pro',
+          scanTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+          location: { latitude: 6.5200, longitude: 3.3800 },
+          action: 'audit'
+        },
+        {
+          id: '3',
+          assetId: 'AST-2024-003',
+          assetName: 'Office Chair Executive',
+          scanTime: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+          action: 'view'
+        },
+        {
+          id: '4',
+          assetId: 'AST-2024-004',
+          assetName: 'Projector Epson EB-X41',
+          scanTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+          location: { latitude: 6.5180, longitude: 3.3850 },
+          action: 'handover'
+        }
+      ];
+      setActivities(sampleActivities);
     }
   };
 
