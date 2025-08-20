@@ -6,7 +6,7 @@ import { HandOverForm } from '@/components/forms/HandOverForm';
 import { AuditForm } from '@/components/forms/AuditForm';
 import { ScanActivityTracker } from '@/components/dashboard/ScanActivityTracker';
 import { AssetQRData } from '@/utils/qrCode';
-import { QrCode, Scan, Plus } from 'lucide-react';
+import { QrCode, Scan } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function QRManagementPage() {
@@ -43,7 +43,7 @@ export default function QRManagementPage() {
   };
 
   return (
-    <DashboardLayout onAddAsset={() => setShowHandoverForm(true)}>
+    <DashboardLayout onAddAsset={() => setShowScanner(true)}>
       <div className="space-y-6">
         {/* Page Header */}
         <div>
@@ -61,16 +61,6 @@ export default function QRManagementPage() {
           >
             <Scan className="h-5 w-5" />
             Scan Asset QR Code
-          </Button>
-          
-          <Button 
-            variant="outline"
-            onClick={() => setShowHandoverForm(true)}
-            className="flex items-center gap-2"
-            size="lg"
-          >
-            <Plus className="h-5 w-5" />
-            Manual Hand-over
           </Button>
         </div>
 
