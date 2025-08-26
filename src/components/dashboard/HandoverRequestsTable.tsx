@@ -43,7 +43,77 @@ export const HandoverRequestsTable: React.FC = () => {
   useEffect(() => {
     // Load handover requests from localStorage
     const storedRequests = JSON.parse(localStorage.getItem('handoverRequests') || '[]');
-    setRequests(storedRequests);
+    
+    // Add dummy data if no requests exist
+    if (storedRequests.length === 0) {
+      const dummyRequests: HandoverRequest[] = [
+        {
+          id: 'HO-1732627800002',
+          assetData: {
+            assetId: 'PROJ-EE-005',
+            assetName: 'Epson EB-X41 Projector',
+            assetType: 'Physical',
+            category: 'Audio/Visual',
+            registrationDate: '2024-02-20'
+          },
+          personName: 'Prof. Michael Chen',
+          department: 'Electrical Engineering',
+          purpose: 'Department seminar on renewable energy technologies. Required for presentation to 150+ attendees in main auditorium.',
+          condition: 'Good working condition, brightness level optimal, all cables included, minor scratch on casing but does not affect functionality.',
+          assetPicture: 'projector_ee_005.jpg',
+          requestDate: '2024-11-25T14:15:00.000Z',
+          status: 'pending',
+          requestedBy: 'Scanner User'
+        },
+        {
+          id: 'HO-1732627800004',
+          assetData: {
+            assetId: 'MIC-AUD-008',
+            assetName: 'Shure SM58 Dynamic Microphone',
+            assetType: 'Physical',
+            category: 'Audio Equipment',
+            registrationDate: '2024-01-30'
+          },
+          personName: 'Dr. Jennifer Liu',
+          department: 'Music Department',
+          purpose: 'Annual cultural fest performance by students. Vocal performances and speech competitions scheduled.',
+          condition: 'Excellent condition, crystal clear audio quality, windscreen included, tested with sound system.',
+          assetPicture: 'microphone_aud_008.jpg',
+          requestDate: '2024-11-23T11:20:00.000Z',
+          status: 'approved',
+          requestedBy: 'Scanner User',
+          approvedBy: 'HOD User',
+          approvalDate: '2024-11-24T10:15:00.000Z',
+          remarks: 'Approved for cultural fest. Please return immediately after event.'
+        },
+        {
+          id: 'HO-1732627800005',
+          assetData: {
+            assetId: 'TAB-IT-015',
+            assetName: 'iPad Pro 12.9-inch',
+            assetType: 'Digital',
+            category: 'Tablets',
+            registrationDate: '2024-03-05'
+          },
+          personName: 'Mr. Alex Thompson',
+          department: 'Information Technology',
+          purpose: 'Student presentation for final year project demo. Interactive presentation with touch-based navigation required.',
+          condition: 'Very good condition, screen protector applied, Apple Pencil included, fully charged, case provided.',
+          assetPicture: 'ipad_it_015.jpg',
+          requestDate: '2024-11-22T15:30:00.000Z',
+          status: 'rejected',
+          requestedBy: 'Scanner User',
+          approvedBy: 'Principal User',
+          approvalDate: '2024-11-23T09:45:00.000Z',
+          remarks: 'iPad reserved for administrative use during board meeting week. Alternative equipment suggested.'
+        }
+      ];
+      
+      localStorage.setItem('handoverRequests', JSON.stringify(dummyRequests));
+      setRequests(dummyRequests);
+    } else {
+      setRequests(storedRequests);
+    }
   }, []);
 
   const handleViewRequest = (request: HandoverRequest) => {
