@@ -11,7 +11,7 @@ interface ScanActivity {
   assetName: string;
   scanTime: Date;
   location?: { latitude: number; longitude: number };
-  action?: 'handover' | 'audit' | 'view';
+  action?: 'handover' | 'view';
 }
 
 export const ScanActivityTracker: React.FC = () => {
@@ -37,14 +37,6 @@ export const ScanActivityTracker: React.FC = () => {
           scanTime: new Date(Date.now() - 5 * 60 * 1000), // 5 minutes ago
           location: { latitude: 6.5244, longitude: 3.3792 },
           action: 'handover'
-        },
-        {
-          id: '2',
-          assetId: 'AST-2024-002',
-          assetName: 'HP Printer LaserJet Pro',
-          scanTime: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-          location: { latitude: 6.5200, longitude: 3.3800 },
-          action: 'audit'
         },
         {
           id: '3',
@@ -74,8 +66,6 @@ export const ScanActivityTracker: React.FC = () => {
     switch (action) {
       case 'handover':
         return <Badge variant="default">Hand-over</Badge>;
-      case 'audit':
-        return <Badge variant="secondary">Audit</Badge>;
       case 'view':
         return <Badge variant="outline">View</Badge>;
       default:
