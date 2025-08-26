@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog';
 import { Badge } from './badge';
 import { AssetQRData, generateAssetQRCode } from '@/utils/qrCode';
+import { ScanHandoverForm } from '@/components/forms/ScanHandoverForm';
 import { ArrowRightLeft, Info, ClipboardCheck, MapPin, Calendar, Tag, QrCode, Download } from 'lucide-react';
 
 interface QRScanOptionsProps {
@@ -25,6 +26,7 @@ export const QRScanOptions: React.FC<QRScanOptionsProps> = ({
 }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [qrLoading, setQrLoading] = useState<boolean>(false);
+  const [showHandoverForm, setShowHandoverForm] = useState<boolean>(false);
 
   useEffect(() => {
     if (isOpen && assetData) {
@@ -154,7 +156,7 @@ export const QRScanOptions: React.FC<QRScanOptionsProps> = ({
             
             <div className="grid grid-cols-1 gap-3">
               <Button 
-                onClick={onHandoverRequest}
+                onClick={() => setShowHandoverForm(true)}
                 className="flex items-center gap-2 h-12"
                 variant="default"
               >
@@ -171,6 +173,12 @@ export const QRScanOptions: React.FC<QRScanOptionsProps> = ({
           </div>
         </div>
       </DialogContent>
+
+      <ScanHandoverForm
+        isOpen={showHandoverForm}
+        onClose={() => setShowHandoverForm(false)}
+        assetData={assetData}
+      />
     </Dialog>
   );
 };
