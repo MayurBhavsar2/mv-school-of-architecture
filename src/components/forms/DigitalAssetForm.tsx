@@ -130,44 +130,51 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
             </div>
 
             {/* License Keys */}
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h3 className="text-lg font-semibold">License Keys</h3>
-              <p className="text-sm text-muted-foreground">Enter unique license key, activation date, and expiry date for each license</p>
-              <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">Enter license details for each license</p>
+              
+              {/* Header Row */}
+              <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                <div className="col-span-1">#</div>
+                <div className="col-span-5">License Key *</div>
+                <div className="col-span-3">Activation Date *</div>
+                <div className="col-span-3">Expiry Date *</div>
+              </div>
+              
+              {/* License Rows */}
+              <div className="space-y-2">
                 {licenseKeys.map((licenseKey, index) => (
-                  <div key={index} className="border rounded-lg p-4 space-y-3">
-                    <Label className="text-sm font-medium">License {index + 1}</Label>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                      <div className="space-y-2">
-                        <Label htmlFor={`license-key-${index}`}>License Key *</Label>
-                        <Input
-                          id={`license-key-${index}`}
-                          value={licenseKey}
-                          onChange={(e) => handleLicenseKeyChange(index, e.target.value)}
-                          placeholder={`Enter license key ${index + 1}`}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`activation-date-${index}`}>Activation Date *</Label>
-                        <Input
-                          id={`activation-date-${index}`}
-                          type="date"
-                          value={licenseActivationDates[index]}
-                          onChange={(e) => handleLicenseActivationDateChange(index, e.target.value)}
-                          required
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor={`expiry-date-${index}`}>Expiry Date *</Label>
-                        <Input
-                          id={`expiry-date-${index}`}
-                          type="date"
-                          value={licenseExpiryDates[index]}
-                          onChange={(e) => handleLicenseExpiryDateChange(index, e.target.value)}
-                          required
-                        />
-                      </div>
+                  <div key={index} className="grid grid-cols-12 gap-2 items-center py-1">
+                    <div className="col-span-1 text-sm font-medium text-center">
+                      {index + 1}
+                    </div>
+                    <div className="col-span-5">
+                      <Input
+                        value={licenseKey}
+                        onChange={(e) => handleLicenseKeyChange(index, e.target.value)}
+                        placeholder={`License key ${index + 1}`}
+                        required
+                        className="h-9"
+                      />
+                    </div>
+                    <div className="col-span-3">
+                      <Input
+                        type="date"
+                        value={licenseActivationDates[index]}
+                        onChange={(e) => handleLicenseActivationDateChange(index, e.target.value)}
+                        required
+                        className="h-9"
+                      />
+                    </div>
+                    <div className="col-span-3">
+                      <Input
+                        type="date"
+                        value={licenseExpiryDates[index]}
+                        onChange={(e) => handleLicenseExpiryDateChange(index, e.target.value)}
+                        required
+                        className="h-9"
+                      />
                     </div>
                   </div>
                 ))}
