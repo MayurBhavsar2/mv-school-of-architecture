@@ -58,18 +58,19 @@ export const ScanHandoverForm: React.FC<ScanHandoverFormProps> = ({
         condition: formData.condition,
         assetPicture: formData.assetPicture?.name || null,
         requestDate: new Date().toISOString(),
-        status: 'pending',
+        status: 'pending_faculty_review',
         requestedBy: 'Scanner User', // In real app, get from auth
+        type: 'scanned_request'
       };
 
-      // Store in localStorage (in real app, send to backend)
-      const existingRequests = JSON.parse(localStorage.getItem('handoverRequests') || '[]');
+      // Store in localStorage for faculty review first
+      const existingRequests = JSON.parse(localStorage.getItem('scanHandoverRequests') || '[]');
       existingRequests.push(handoverRequest);
-      localStorage.setItem('handoverRequests', JSON.stringify(existingRequests));
+      localStorage.setItem('scanHandoverRequests', JSON.stringify(existingRequests));
 
       toast({
         title: "Handover Request Submitted",
-        description: "Your handover request has been sent to faculty for approval.",
+        description: "Your handover request has been sent to faculty for review.",
       });
 
       // Reset form and close

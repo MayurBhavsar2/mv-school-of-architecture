@@ -4,6 +4,7 @@ import { DashboardStats } from "@/components/dashboard/DashboardStats";
 import { AssetChart } from "@/components/dashboard/AssetChart";
 import { RecentAssets } from "@/components/dashboard/RecentAssets";
 import { AssetTypeSelector } from "@/components/forms/AssetTypeSelector";
+import { ScanHandoverRequestsTable } from "@/components/dashboard/ScanHandoverRequestsTable";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -277,6 +278,9 @@ const Index = () => {
               </CardContent>
             </Card>
           </div>
+          
+          {/* Scan Handover Requests */}
+          <ScanHandoverRequestsTable />
           
           <AssetChart />
           <RecentAssets />
