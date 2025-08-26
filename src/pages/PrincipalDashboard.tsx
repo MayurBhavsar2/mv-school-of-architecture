@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { HandoverRequestsTable } from "@/components/dashboard/HandoverRequestsTable";
 import { Bell, Filter, FileCheck, AlertTriangle, Package, Wrench, TrendingDown, Users, Calendar, ExternalLink, UserCheck, RefreshCw, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -448,6 +449,9 @@ const PrincipalDashboard = () => {
           </Card>
         </div>
 
+
+        {/* Handover Requests */}
+        <HandoverRequestsTable />
 
         {/* Recent Activity */}
         <Card>

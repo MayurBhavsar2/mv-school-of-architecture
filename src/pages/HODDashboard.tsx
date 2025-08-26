@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
+import { HandoverRequestsTable } from "@/components/dashboard/HandoverRequestsTable";
 import { Bell, Package, CheckCircle, Clock, FileText, AlertTriangle, User, Wrench, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -363,6 +364,11 @@ const HODDashboard = () => {
             </Table>
           </CardContent>
         </Card>
+
+        {/* Handover Requests */}
+        <HandoverRequestsTable />
+
+        {/* Audit Assignments */}
 
         {/* Notifications Dialog */}
         <Dialog open={showNotifications} onOpenChange={setShowNotifications}>
