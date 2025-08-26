@@ -19,27 +19,32 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
   const [licenseKeyFiles, setLicenseKeyFiles] = useState<File[]>([]);
   const [licenseActivationDates, setLicenseActivationDates] = useState<string[]>([""]);
   const [licenseExpiryDates, setLicenseExpiryDates] = useState<string[]>([""]);
+  const [licenseSystemDetails, setLicenseSystemDetails] = useState<string[]>([""]);
 
   const handleQuantityChange = (newQuantity: number) => {
     setQuantity(newQuantity);
     const currentKeys = [...licenseKeys];
     const currentActivationDates = [...licenseActivationDates];
     const currentExpiryDates = [...licenseExpiryDates];
+    const currentSystemDetails = [...licenseSystemDetails];
     
     if (newQuantity > currentKeys.length) {
       // Add more license key fields
       const additionalKeys = Array(newQuantity - currentKeys.length).fill("");
       const additionalActivationDates = Array(newQuantity - currentKeys.length).fill("");
       const additionalExpiryDates = Array(newQuantity - currentKeys.length).fill("");
+      const additionalSystemDetails = Array(newQuantity - currentKeys.length).fill("");
       setLicenseKeys([...currentKeys, ...additionalKeys]);
       setLicenseActivationDates([...currentActivationDates, ...additionalActivationDates]);
       setLicenseExpiryDates([...currentExpiryDates, ...additionalExpiryDates]);
+      setLicenseSystemDetails([...currentSystemDetails, ...additionalSystemDetails]);
     } else if (newQuantity < currentKeys.length) {
       // Remove excess license key fields
       setLicenseKeys(currentKeys.slice(0, newQuantity));
       setLicenseKeyFiles(licenseKeyFiles.slice(0, newQuantity));
       setLicenseActivationDates(currentActivationDates.slice(0, newQuantity));
       setLicenseExpiryDates(currentExpiryDates.slice(0, newQuantity));
+      setLicenseSystemDetails(currentSystemDetails.slice(0, newQuantity));
     }
   };
 
@@ -59,6 +64,12 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
     const updatedDates = [...licenseExpiryDates];
     updatedDates[index] = value;
     setLicenseExpiryDates(updatedDates);
+  };
+
+  const handleLicenseSystemChange = (index: number, value: string) => {
+    const updatedSystems = [...licenseSystemDetails];
+    updatedSystems[index] = value;
+    setLicenseSystemDetails(updatedSystems);
   };
 
   const handleLicenseFileChange = (index: number, file: File | null) => {
@@ -137,9 +148,10 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
               {/* Header Row */}
               <div className="grid grid-cols-12 gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 <div className="col-span-1">#</div>
-                <div className="col-span-5">License Key *</div>
-                <div className="col-span-3">Activation Date *</div>
-                <div className="col-span-3">Expiry Date *</div>
+                <div className="col-span-4">License Key *</div>
+                <div className="col-span-2">Activation *</div>
+                <div className="col-span-2">Expiry *</div>
+                <div className="col-span-3">System/Computer *</div>
               </div>
               
               {/* License Rows */}
@@ -149,7 +161,7 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
                     <div className="col-span-1 text-sm font-medium text-center">
                       {index + 1}
                     </div>
-                    <div className="col-span-5">
+                    <div className="col-span-4">
                       <Input
                         value={licenseKey}
                         onChange={(e) => handleLicenseKeyChange(index, e.target.value)}
@@ -158,7 +170,7 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
                         className="h-9"
                       />
                     </div>
-                    <div className="col-span-3">
+                    <div className="col-span-2">
                       <Input
                         type="date"
                         value={licenseActivationDates[index]}
@@ -167,11 +179,20 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
                         className="h-9"
                       />
                     </div>
-                    <div className="col-span-3">
+                    <div className="col-span-2">
                       <Input
                         type="date"
                         value={licenseExpiryDates[index]}
                         onChange={(e) => handleLicenseExpiryDateChange(index, e.target.value)}
+                        required
+                        className="h-9"
+                      />
+                    </div>
+                    <div className="col-span-3">
+                      <Input
+                        value={licenseSystemDetails[index]}
+                        onChange={(e) => handleLicenseSystemChange(index, e.target.value)}
+                        placeholder={`PC-${index + 1} or System ID`}
                         required
                         className="h-9"
                       />
