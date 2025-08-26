@@ -161,15 +161,6 @@ export const QRScanOptions: React.FC<QRScanOptionsProps> = ({
                 <ArrowRightLeft className="h-5 w-5" />
                 Create Hand-over Request
               </Button>
-              
-              <Button 
-                onClick={onAuditRequest}
-                className="flex items-center gap-2 h-12"
-                variant="outline"
-              >
-                <ClipboardCheck className="h-5 w-5" />
-                Start Asset Audit
-              </Button>
             </div>
           </div>
 
