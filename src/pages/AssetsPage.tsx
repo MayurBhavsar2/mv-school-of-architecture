@@ -303,17 +303,15 @@ const AssetsPage = () => {
                     </TableCell>
                      <TableCell>
                        <div className="flex gap-1">
-                         {category !== 'digital' && (
-                           <Button 
-                             variant="outline" 
-                             size="sm"
-                             onClick={() => handleShowQR(item)}
-                             className="gap-1"
-                           >
-                             <QrCode className="h-3 w-3" />
-                             Generate QR
-                           </Button>
-                         )}
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                           onClick={() => handleShowQR(item)}
+                           className="gap-1"
+                         >
+                           <QrCode className="h-3 w-3" />
+                           Generate QR
+                         </Button>
                          <Button 
                            variant="outline" 
                            size="sm"
