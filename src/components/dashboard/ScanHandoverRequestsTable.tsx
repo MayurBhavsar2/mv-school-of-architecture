@@ -44,7 +44,80 @@ export const ScanHandoverRequestsTable: React.FC = () => {
   useEffect(() => {
     // Load scan handover requests from localStorage
     const storedRequests = JSON.parse(localStorage.getItem('scanHandoverRequests') || '[]');
-    setRequests(storedRequests);
+    
+    // Add dummy data if no requests exist
+    if (storedRequests.length === 0) {
+      const dummyRequests: ScanHandoverRequest[] = [
+        {
+          id: 'HO-1732627800001',
+          assetData: {
+            assetId: 'LAP-CS-001',
+            assetName: 'Dell Inspiron 15 3000',
+            assetType: 'Physical',
+            category: 'Laptops',
+            registrationDate: '2024-01-15'
+          },
+          personName: 'Dr. Sarah Johnson',
+          department: 'Computer Science',
+          purpose: 'Research project on machine learning algorithms for final year students. Need laptop for data processing and model training.',
+          condition: 'Excellent condition, all ports working, battery life 6-8 hours, no physical damage observed.',
+          assetPicture: 'laptop_cs_001.jpg',
+          requestDate: '2024-11-26T10:30:00.000Z',
+          status: 'pending_faculty_review',
+          requestedBy: 'Scanner User',
+          type: 'scanned_request'
+        },
+        {
+          id: 'HO-1732627800002',
+          assetData: {
+            assetId: 'PROJ-EE-005',
+            assetName: 'Epson EB-X41 Projector',
+            assetType: 'Physical',
+            category: 'Audio/Visual',
+            registrationDate: '2024-02-20'
+          },
+          personName: 'Prof. Michael Chen',
+          department: 'Electrical Engineering',
+          purpose: 'Department seminar on renewable energy technologies. Required for presentation to 150+ attendees in main auditorium.',
+          condition: 'Good working condition, brightness level optimal, all cables included, minor scratch on casing but does not affect functionality.',
+          assetPicture: 'projector_ee_005.jpg',
+          requestDate: '2024-11-25T14:15:00.000Z',
+          status: 'approved_by_faculty',
+          requestedBy: 'Scanner User',
+          type: 'scanned_request',
+          facultyRemarks: 'Approved for academic seminar. Please ensure proper handling.',
+          facultyApprovedBy: 'Faculty User',
+          facultyApprovalDate: '2024-11-26T09:00:00.000Z'
+        },
+        {
+          id: 'HO-1732627800003',
+          assetData: {
+            assetId: 'CAM-MEDIA-012',
+            assetName: 'Canon EOS 2000D DSLR Camera',
+            assetType: 'Physical',
+            category: 'Photography',
+            registrationDate: '2024-03-10'
+          },
+          personName: 'Ms. Emily Rodriguez',
+          department: 'Mass Communication',
+          purpose: 'Student documentary project on campus sustainability initiatives. Part of final semester assignment.',
+          condition: 'Very good condition, lens clear, battery charged, memory card included, carrying case provided.',
+          assetPicture: 'camera_media_012.jpg',
+          requestDate: '2024-11-24T16:45:00.000Z',
+          status: 'rejected_by_faculty',
+          requestedBy: 'Scanner User',
+          type: 'scanned_request',
+          facultyRemarks: 'Equipment not available for student projects during exam period. Please request after December 15th.',
+          facultyApprovedBy: 'Faculty User',
+          facultyApprovalDate: '2024-11-25T11:30:00.000Z'
+        }
+      ];
+      
+      localStorage.setItem('scanHandoverRequests', JSON.stringify(dummyRequests));
+      setRequests(dummyRequests);
+    } else {
+      setRequests(storedRequests);
+    }
   }, []);
 
   const handleViewRequest = (request: ScanHandoverRequest) => {
