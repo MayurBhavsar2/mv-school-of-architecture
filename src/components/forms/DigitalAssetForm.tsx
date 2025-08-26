@@ -17,19 +17,29 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
   const [quantity, setQuantity] = useState(1);
   const [licenseKeys, setLicenseKeys] = useState<string[]>([""]);
   const [licenseKeyFiles, setLicenseKeyFiles] = useState<File[]>([]);
+  const [licenseActivationDates, setLicenseActivationDates] = useState<string[]>([""]);
+  const [licenseExpiryDates, setLicenseExpiryDates] = useState<string[]>([""]);
 
   const handleQuantityChange = (newQuantity: number) => {
     setQuantity(newQuantity);
     const currentKeys = [...licenseKeys];
+    const currentActivationDates = [...licenseActivationDates];
+    const currentExpiryDates = [...licenseExpiryDates];
     
     if (newQuantity > currentKeys.length) {
       // Add more license key fields
       const additionalKeys = Array(newQuantity - currentKeys.length).fill("");
+      const additionalActivationDates = Array(newQuantity - currentKeys.length).fill("");
+      const additionalExpiryDates = Array(newQuantity - currentKeys.length).fill("");
       setLicenseKeys([...currentKeys, ...additionalKeys]);
+      setLicenseActivationDates([...currentActivationDates, ...additionalActivationDates]);
+      setLicenseExpiryDates([...currentExpiryDates, ...additionalExpiryDates]);
     } else if (newQuantity < currentKeys.length) {
       // Remove excess license key fields
       setLicenseKeys(currentKeys.slice(0, newQuantity));
       setLicenseKeyFiles(licenseKeyFiles.slice(0, newQuantity));
+      setLicenseActivationDates(currentActivationDates.slice(0, newQuantity));
+      setLicenseExpiryDates(currentExpiryDates.slice(0, newQuantity));
     }
   };
 
@@ -37,6 +47,18 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
     const updatedKeys = [...licenseKeys];
     updatedKeys[index] = value;
     setLicenseKeys(updatedKeys);
+  };
+
+  const handleLicenseActivationDateChange = (index: number, value: string) => {
+    const updatedDates = [...licenseActivationDates];
+    updatedDates[index] = value;
+    setLicenseActivationDates(updatedDates);
+  };
+
+  const handleLicenseExpiryDateChange = (index: number, value: string) => {
+    const updatedDates = [...licenseExpiryDates];
+    updatedDates[index] = value;
+    setLicenseExpiryDates(updatedDates);
   };
 
   const handleLicenseFileChange = (index: number, file: File | null) => {
@@ -110,37 +132,48 @@ export const DigitalAssetForm = ({ onClose }: DigitalAssetFormProps) => {
             {/* License Keys */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">License Keys</h3>
-              <p className="text-sm text-muted-foreground">Enter unique license key for each license</p>
-              <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">Enter unique license key, activation date, and expiry date for each license</p>
+              <div className="space-y-4">
                 {licenseKeys.map((licenseKey, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <Label className="min-w-[120px]">License {index + 1} *</Label>
-                    <Input
-                      value={licenseKey}
-                      onChange={(e) => handleLicenseKeyChange(index, e.target.value)}
-                      placeholder={`Enter license key ${index + 1}`}
-                      required
-                      className="flex-1"
-                    />
+                  <div key={index} className="border rounded-lg p-4 space-y-3">
+                    <Label className="text-sm font-medium">License {index + 1}</Label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor={`license-key-${index}`}>License Key *</Label>
+                        <Input
+                          id={`license-key-${index}`}
+                          value={licenseKey}
+                          onChange={(e) => handleLicenseKeyChange(index, e.target.value)}
+                          placeholder={`Enter license key ${index + 1}`}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`activation-date-${index}`}>Activation Date *</Label>
+                        <Input
+                          id={`activation-date-${index}`}
+                          type="date"
+                          value={licenseActivationDates[index]}
+                          onChange={(e) => handleLicenseActivationDateChange(index, e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor={`expiry-date-${index}`}>Expiry Date *</Label>
+                        <Input
+                          id={`expiry-date-${index}`}
+                          type="date"
+                          value={licenseExpiryDates[index]}
+                          onChange={(e) => handleLicenseExpiryDateChange(index, e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* License Information */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">License Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="activationDate">Activation Date *</Label>
-                  <Input id="activationDate" type="date" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="expiryDate">Expiry Date *</Label>
-                  <Input id="expiryDate" type="date" required />
-                </div>
-              </div>
-            </div>
 
             {/* Returns Information */}
             <div className="space-y-4">
