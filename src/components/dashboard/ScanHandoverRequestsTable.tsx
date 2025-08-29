@@ -22,6 +22,9 @@ interface ScanHandoverRequest {
   department: string;
   purpose: string;
   condition: string;
+  customPurpose?: string;
+  customCondition?: string;
+  coordinates?: string;
   assetPicture: string | null;
   requestDate: string;
   status: 'pending_faculty_review' | 'approved_by_faculty' | 'rejected_by_faculty';
@@ -59,8 +62,9 @@ export const ScanHandoverRequestsTable: React.FC = () => {
           },
           personName: 'Dr. Sarah Johnson',
           department: 'Computer Science',
-          purpose: 'Research project on machine learning algorithms for final year students. Need laptop for data processing and model training.',
-          condition: 'Excellent condition, all ports working, battery life 6-8 hours, no physical damage observed.',
+          purpose: 'Research',
+          condition: 'Excellent - Like new',
+          coordinates: '28.6139, 77.2090',
           assetPicture: 'laptop_cs_001.jpg',
           requestDate: '2024-11-26T10:30:00.000Z',
           status: 'pending_faculty_review',
@@ -78,8 +82,9 @@ export const ScanHandoverRequestsTable: React.FC = () => {
           },
           personName: 'Prof. Michael Chen',
           department: 'Electrical Engineering',
-          purpose: 'Department seminar on renewable energy technologies. Required for presentation to 150+ attendees in main auditorium.',
-          condition: 'Good working condition, brightness level optimal, all cables included, minor scratch on casing but does not affect functionality.',
+          purpose: 'Teaching',
+          condition: 'Good - Minor wear',
+          coordinates: '28.6140, 77.2091',
           assetPicture: 'projector_ee_005.jpg',
           requestDate: '2024-11-25T14:15:00.000Z',
           status: 'approved_by_faculty',
@@ -100,8 +105,11 @@ export const ScanHandoverRequestsTable: React.FC = () => {
           },
           personName: 'Ms. Emily Rodriguez',
           department: 'Mass Communication',
-          purpose: 'Student documentary project on campus sustainability initiatives. Part of final semester assignment.',
-          condition: 'Very good condition, lens clear, battery charged, memory card included, carrying case provided.',
+          purpose: 'Other',
+          customPurpose: 'Student documentary project on campus sustainability initiatives for final semester assignment',
+          condition: 'Other',
+          customCondition: 'Very good condition, lens clear, battery charged, memory card included, carrying case provided',
+          coordinates: '28.6138, 77.2089',
           assetPicture: 'camera_media_012.jpg',
           requestDate: '2024-11-24T16:45:00.000Z',
           status: 'rejected_by_faculty',
@@ -152,8 +160,9 @@ export const ScanHandoverRequestsTable: React.FC = () => {
             assetData: req.assetData,
             personName: req.personName,
             department: req.department,
-            purpose: req.purpose,
-            condition: req.condition,
+            purpose: req.purpose === 'Other' ? req.customPurpose : req.purpose,
+            condition: req.condition === 'Other' ? req.customCondition : req.condition,
+            coordinates: req.coordinates,
             assetPicture: req.assetPicture,
             requestDate: req.requestDate,
             status: 'pending' as const,
@@ -240,7 +249,9 @@ export const ScanHandoverRequestsTable: React.FC = () => {
                       </TableCell>
                       <TableCell>{request.personName}</TableCell>
                       <TableCell>{request.department}</TableCell>
-                      <TableCell className="max-w-[200px] truncate">{request.purpose}</TableCell>
+                      <TableCell className="max-w-[200px] truncate">
+                        {request.purpose === 'Other' ? request.customPurpose : request.purpose}
+                      </TableCell>
                       <TableCell>{new Date(request.requestDate).toLocaleDateString()}</TableCell>
                       <TableCell>{getStatusBadge(request.status)}</TableCell>
                       <TableCell>
@@ -353,12 +364,22 @@ export const ScanHandoverRequestsTable: React.FC = () => {
                 <CardContent className="space-y-4">
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Purpose</Label>
-                    <p className="mt-1 p-3 bg-muted rounded-md">{selectedRequest.purpose}</p>
+                    <p className="mt-1 p-3 bg-muted rounded-md">
+                      {selectedRequest.purpose === 'Other' ? selectedRequest.customPurpose : selectedRequest.purpose}
+                    </p>
                   </div>
                   <div>
                     <Label className="text-sm font-medium text-muted-foreground">Condition Before Handover</Label>
-                    <p className="mt-1 p-3 bg-muted rounded-md">{selectedRequest.condition}</p>
+                    <p className="mt-1 p-3 bg-muted rounded-md">
+                      {selectedRequest.condition === 'Other' ? selectedRequest.customCondition : selectedRequest.condition}
+                    </p>
                   </div>
+                  {selectedRequest.coordinates && (
+                    <div>
+                      <Label className="text-sm font-medium text-muted-foreground">Location Coordinates</Label>
+                      <p className="mt-1 p-3 bg-muted rounded-md font-mono text-sm">{selectedRequest.coordinates}</p>
+                    </div>
+                  )}
                   {selectedRequest.assetPicture && (
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Asset Picture</Label>

@@ -22,6 +22,7 @@ interface HandoverRequest {
   department: string;
   purpose: string;
   condition: string;
+  coordinates?: string;
   assetPicture: string | null;
   requestDate: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -327,6 +328,12 @@ export const HandoverRequestsTable: React.FC = () => {
                     <Label className="text-sm font-medium text-muted-foreground">Condition Before Handover</Label>
                     <p className="mt-1 p-3 bg-muted rounded-md">{selectedRequest.condition}</p>
                   </div>
+                  {selectedRequest.coordinates && (
+                    <div>
+                      <Label className="text-sm font-medium text-muted-foreground">Location Coordinates</Label>
+                      <p className="mt-1 p-3 bg-muted rounded-md font-mono text-sm">{selectedRequest.coordinates}</p>
+                    </div>
+                  )}
                   {selectedRequest.assetPicture && (
                     <div>
                       <Label className="text-sm font-medium text-muted-foreground">Asset Picture</Label>
