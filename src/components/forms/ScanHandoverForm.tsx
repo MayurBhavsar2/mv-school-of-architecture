@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
-import { Upload, User, Building, FileText, Camera } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Upload, User, Building, FileText, Camera, MapPin } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { AssetQRData } from '@/utils/qrCode';
+import { getCurrentUser } from '@/utils/testUser';
 
 interface ScanHandoverFormProps {
   isOpen: boolean;
@@ -26,9 +28,64 @@ export const ScanHandoverForm: React.FC<ScanHandoverFormProps> = ({
     department: '',
     purpose: '',
     condition: '',
+    customPurpose: '',
+    customCondition: '',
+    coordinates: '',
     assetPicture: null as File | null,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Predefined options
+  const purposeOptions = [
+    'Teaching',
+    'Research',
+    'Administrative Work',
+    'Lab Experiment',
+    'Student Project',
+    'Maintenance',
+    'Other'
+  ];
+
+  const conditionOptions = [
+    'Excellent - Like new',
+    'Good - Minor wear',
+    'Fair - Some wear visible',
+    'Poor - Significant wear',
+    'Damaged - Needs repair',
+    'Other'
+  ];
+
+  // Auto-fill user information and get coordinates
+  useEffect(() => {
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+      setFormData(prev => ({
+        ...prev,
+        personName: currentUser.name || '',
+        department: currentUser.department || '',
+      }));
+    }
+
+    // Get user coordinates
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormData(prev => ({
+            ...prev,
+            coordinates: `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
+          }));
+        },
+        (error) => {
+          console.log('Location access denied:', error);
+          setFormData(prev => ({
+            ...prev,
+            coordinates: 'Location not available'
+          }));
+        }
+      );
+    }
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -79,6 +136,9 @@ export const ScanHandoverForm: React.FC<ScanHandoverFormProps> = ({
         department: '',
         purpose: '',
         condition: '',
+        customPurpose: '',
+        customCondition: '',
+        coordinates: '',
         assetPicture: null,
       });
       onClose();
@@ -93,7 +153,12 @@ export const ScanHandoverForm: React.FC<ScanHandoverFormProps> = ({
     }
   };
 
-  const isFormValid = formData.personName && formData.department && formData.purpose && formData.condition;
+  const isFormValid = formData.personName && 
+    formData.department && 
+    formData.purpose && 
+    formData.condition &&
+    (formData.purpose !== 'Other' || formData.customPurpose.trim()) &&
+    (formData.condition !== 'Other' || formData.customCondition.trim());
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -145,35 +210,77 @@ export const ScanHandoverForm: React.FC<ScanHandoverFormProps> = ({
               onChange={handleInputChange}
               placeholder="Enter department"
               required
+              disabled
+            />
+          </div>
+
+          {/* Coordinates */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              Location Coordinates
+            </Label>
+            <Input
+              value={formData.coordinates}
+              placeholder="Getting location..."
+              disabled
             />
           </div>
 
           {/* Purpose */}
           <div className="space-y-2">
             <Label htmlFor="purpose">Purpose</Label>
-            <Textarea
-              id="purpose"
-              name="purpose"
-              value={formData.purpose}
-              onChange={handleInputChange}
-              placeholder="Enter purpose for handover"
-              rows={3}
-              required
-            />
+            <Select 
+              value={formData.purpose} 
+              onValueChange={(value) => setFormData(prev => ({ ...prev, purpose: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select purpose" />
+              </SelectTrigger>
+              <SelectContent>
+                {purposeOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {formData.purpose === 'Other' && (
+              <Textarea
+                placeholder="Please specify purpose"
+                value={formData.customPurpose}
+                onChange={(e) => setFormData(prev => ({ ...prev, customPurpose: e.target.value }))}
+                rows={2}
+              />
+            )}
           </div>
 
           {/* Condition Before Handover */}
           <div className="space-y-2">
             <Label htmlFor="condition">Condition Before Hand-over</Label>
-            <Textarea
-              id="condition"
-              name="condition"
-              value={formData.condition}
-              onChange={handleInputChange}
-              placeholder="Describe asset condition"
-              rows={3}
-              required
-            />
+            <Select 
+              value={formData.condition} 
+              onValueChange={(value) => setFormData(prev => ({ ...prev, condition: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select condition" />
+              </SelectTrigger>
+              <SelectContent>
+                {conditionOptions.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {formData.condition === 'Other' && (
+              <Textarea
+                placeholder="Please describe condition"
+                value={formData.customCondition}
+                onChange={(e) => setFormData(prev => ({ ...prev, customCondition: e.target.value }))}
+                rows={2}
+              />
+            )}
           </div>
 
           {/* Asset Picture Upload */}
