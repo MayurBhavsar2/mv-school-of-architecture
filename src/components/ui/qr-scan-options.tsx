@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { AssetQRData, generateAssetQRCode } from '@/utils/qrCode';
 import { ScanHandoverForm } from '@/components/forms/ScanHandoverForm';
 import { AuditForm } from '@/components/forms/AuditForm';
-import { ArrowRightLeft, Info, ClipboardCheck, MapPin, Calendar, Tag, QrCode, Download, Settings, FileSearch } from 'lucide-react';
+import { setupTestAuditor, setupRegularUser, getCurrentUser } from '@/utils/testUser';
+import { ArrowRightLeft, Info, ClipboardCheck, MapPin, Calendar, Tag, QrCode, Download, Settings, FileSearch, UserCheck } from 'lucide-react';
 
 interface QRScanOptionsProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ export const QRScanOptions: React.FC<QRScanOptionsProps> = ({
   const [assetStatus, setAssetStatus] = useState<string>('');
   
   // Check if current user is an auditor (this should come from your auth context)
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const currentUser = getCurrentUser() || {};
   const isAuditor = currentUser.role === 'auditor' || currentUser.isAuditor;
 
   useEffect(() => {
@@ -219,6 +220,33 @@ export const QRScanOptions: React.FC<QRScanOptionsProps> = ({
                   Start Asset Audit
                 </Button>
               )}
+            </div>
+
+            {/* Demo User Controls */}
+            <div className="pt-4 border-t space-y-2">
+              <p className="text-xs text-muted-foreground">Demo Controls:</p>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={setupTestAuditor}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                >
+                  <UserCheck className="h-3 w-3 mr-1" />
+                  Switch to Auditor
+                </Button>
+                <Button 
+                  onClick={setupRegularUser}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                >
+                  Switch to Faculty
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Current user: {currentUser.name || 'Not set'} ({currentUser.role || 'No role'})
+              </p>
             </div>
           </div>
 
