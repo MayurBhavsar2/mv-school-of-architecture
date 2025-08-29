@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { AssetQRData } from "@/utils/qrCode";
 import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
 import { X, ClipboardCheck, MapPin, Calendar } from "lucide-react";
 
 interface AuditFormData {
@@ -26,6 +27,7 @@ interface AuditFormData {
   recommendedActions: string;
   pictures: FileList;
   auditType: 'routine' | 'maintenance' | 'incident' | 'handover';
+  checklist: Record<string, boolean>;
 }
 
 interface AuditFormProps {
@@ -36,15 +38,63 @@ interface AuditFormProps {
 
 export const AuditForm = ({ onClose, assetData, scanLocation }: AuditFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [checklist, setChecklist] = useState<Record<string, boolean>>({});
+  
+  // Get current user info (assuming auditor is pre-filled)
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<AuditFormData>({
     defaultValues: {
       auditId: `AUD-${Date.now()}`,
       assetId: assetData?.assetId || '',
       assetName: assetData?.assetName || '',
       auditDate: new Date().toISOString().split('T')[0],
-      auditType: 'routine'
+      auditType: 'routine',
+      auditorName: currentUser.name || '',
+      checklist: {}
     }
   });
+
+  // Define audit checklist items based on asset type
+  const getChecklistItems = (assetType: string, category: string) => {
+    const commonItems = [
+      'Asset ID verification',
+      'Physical appearance inspection',
+      'Location confirmation',
+      'Documentation review'
+    ];
+
+    const specificItems: Record<string, string[]> = {
+      'Physical': [
+        'Structural integrity check',
+        'Moving parts inspection',
+        'Safety features verification',
+        'Wear and tear assessment'
+      ],
+      'Digital': [
+        'Software functionality test',
+        'Data integrity check',
+        'Security assessment',
+        'Performance evaluation'
+      ],
+      'Audio/Visual': [
+        'Display quality check',
+        'Audio output test',
+        'Cable and connection inspection',
+        'Remote control functionality'
+      ],
+      'Laboratory': [
+        'Calibration verification',
+        'Safety protocol compliance',
+        'Chemical/material inventory',
+        'Equipment functionality test'
+      ]
+    };
+
+    return [...commonItems, ...(specificItems[category] || specificItems[assetType] || [])];
+  };
+
+  const checklistItems = assetData ? getChecklistItems(assetData.assetType, assetData.category) : [];
 
   const watchedAuditType = watch('auditType');
 
@@ -287,6 +337,41 @@ export const AuditForm = ({ onClose, assetData, scanLocation }: AuditFormProps) 
               </div>
             </CardContent>
           </Card>
+
+          {/* Audit Checklist */}
+          {checklistItems.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Audit Checklist</CardTitle>
+                <p className="text-sm text-muted-foreground">
+                  Check all items that have been verified during the audit
+                </p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {checklistItems.map((item, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`checklist-${index}`}
+                        checked={checklist[item] || false}
+                        onCheckedChange={(checked) => {
+                          const newChecklist = { ...checklist, [item]: !!checked };
+                          setChecklist(newChecklist);
+                          setValue('checklist', newChecklist);
+                        }}
+                      />
+                      <Label
+                        htmlFor={`checklist-${index}`}
+                        className="text-sm font-normal cursor-pointer"
+                      >
+                        {item}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="flex justify-end gap-4">
             <Button type="button" variant="outline" onClick={onClose}>

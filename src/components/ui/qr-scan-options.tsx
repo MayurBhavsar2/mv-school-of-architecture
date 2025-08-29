@@ -3,9 +3,11 @@ import { Button } from './button';
 import { Card, CardContent, CardHeader, CardTitle } from './card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog';
 import { Badge } from './badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
 import { AssetQRData, generateAssetQRCode } from '@/utils/qrCode';
 import { ScanHandoverForm } from '@/components/forms/ScanHandoverForm';
-import { ArrowRightLeft, Info, ClipboardCheck, MapPin, Calendar, Tag, QrCode, Download } from 'lucide-react';
+import { AuditForm } from '@/components/forms/AuditForm';
+import { ArrowRightLeft, Info, ClipboardCheck, MapPin, Calendar, Tag, QrCode, Download, Settings, FileSearch } from 'lucide-react';
 
 interface QRScanOptionsProps {
   isOpen: boolean;
@@ -27,6 +29,12 @@ export const QRScanOptions: React.FC<QRScanOptionsProps> = ({
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [qrLoading, setQrLoading] = useState<boolean>(false);
   const [showHandoverForm, setShowHandoverForm] = useState<boolean>(false);
+  const [showAuditForm, setShowAuditForm] = useState<boolean>(false);
+  const [assetStatus, setAssetStatus] = useState<string>('');
+  
+  // Check if current user is an auditor (this should come from your auth context)
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const isAuditor = currentUser.role === 'auditor' || currentUser.isAuditor;
 
   useEffect(() => {
     if (isOpen && assetData) {
@@ -47,6 +55,24 @@ export const QRScanOptions: React.FC<QRScanOptionsProps> = ({
       link.click();
       document.body.removeChild(link);
     }
+  };
+
+  const handleStatusUpdate = (status: string) => {
+    setAssetStatus(status);
+    // Save status to localStorage or send to backend
+    const statusUpdate = {
+      assetId: assetData.assetId,
+      status: status,
+      updatedAt: new Date().toISOString(),
+      updatedBy: currentUser.name || 'Unknown User'
+    };
+    
+    const existingStatuses = JSON.parse(localStorage.getItem('assetStatuses') || '[]');
+    const updatedStatuses = existingStatuses.filter((s: any) => s.assetId !== assetData.assetId);
+    updatedStatuses.push(statusUpdate);
+    localStorage.setItem('assetStatuses', JSON.stringify(updatedStatuses));
+    
+    console.log('Asset status updated:', statusUpdate);
   };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -163,6 +189,36 @@ export const QRScanOptions: React.FC<QRScanOptionsProps> = ({
                 <ArrowRightLeft className="h-5 w-5" />
                 Create Hand-over Request
               </Button>
+
+              {/* Status of Asset Button */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Status of Asset:</label>
+                <Select value={assetStatus} onValueChange={handleStatusUpdate}>
+                  <SelectTrigger className="h-12">
+                    <div className="flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      <SelectValue placeholder="Select asset status" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="available">Available</SelectItem>
+                    <SelectItem value="not-available">Not Available</SelectItem>
+                    <SelectItem value="need-to-purchase">Need to Purchase</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Audit Button - Only visible to auditors */}
+              {isAuditor && (
+                <Button 
+                  onClick={() => setShowAuditForm(true)}
+                  className="flex items-center gap-2 h-12"
+                  variant="secondary"
+                >
+                  <FileSearch className="h-5 w-5" />
+                  Start Asset Audit
+                </Button>
+              )}
             </div>
           </div>
 
@@ -179,6 +235,14 @@ export const QRScanOptions: React.FC<QRScanOptionsProps> = ({
         onClose={() => setShowHandoverForm(false)}
         assetData={assetData}
       />
+
+      {showAuditForm && (
+        <AuditForm
+          onClose={() => setShowAuditForm(false)}
+          assetData={assetData}
+          scanLocation={scanLocation}
+        />
+      )}
     </Dialog>
   );
 };
